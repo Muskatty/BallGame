@@ -1,0 +1,86 @@
+#include "mainwindow.h"
+#include "QRandomGenerator"
+
+BallGridWidget::BallGridWidget(QWidget* parent) : QWidget(parent)
+{
+    setFixedSize(windowWidth, windowHeight);
+
+    visited.resize(rows, std::vector<QColor>(cols, QColor(60, 60, 60)));
+
+    balls.push_back(Ball(QPointF(100.0, 100.0), QPointF(240.0, 240.0), 20.0));
+    balls.push_back(Ball(QPointF(100.0, 500.0), QPointF(240.0, 240.0), 20.0));
+    balls.push_back(Ball(QPointF(500.0, 500.0), QPointF(240.0, 240.0), 20.0));
+    balls[0].setWeaponLen(weaponLen);
+    balls[1].setTraceColor(Qt::green);
+    balls[1].accelerate(20.0);
+    balls[1].setWeaponLen(weaponLen);
+    balls[2].setTraceColor(Qt::yellow);
+    balls[2].accelerate(30.0);
+    balls[2].setWeaponLen(weaponLen);
+    field = QRectF(0.0, 0.0, windowWidth, windowHeight);
+
+    timer.setInterval(16); // ~60 FPS
+    connect(&timer, &QTimer::timeout, this, &BallGridWidget::onTick);
+    timer.start();
+}
+
+void BallGridWidget::paintEvent(QPaintEvent*)
+{
+    QPainter painter(this);
+    painter.fillRect(rect(), QColor(30, 30, 30));
+
+    // Сетка
+    for (int y = 0; y < rows; ++y) {
+        for (int x = 0; x < cols; ++x) {
+            QRect cellRect(x * cellSize, y * cellSize, cellSize - 1, cellSize - 1);
+
+            painter.fillRect(cellRect, visited[y][x]);
+        }
+    }
+
+    for (auto& ball : balls) {
+        ball.draw(painter);
+    }
+}
+
+void BallGridWidget::onTick()
+{
+    const double dt = 0.016;
+
+    for (int i = 0; i < balls.size(); i++) {
+        balls[i].move(dt);
+        balls[i].resolveCollision(field);
+
+        for (int j = i + 1; j < balls.size(); j++) {
+            if (balls[i].bounceOff(balls[j])) {
+                int r = QRandomGenerator::global()->bounded(0, 256);
+                int g = QRandomGenerator::global()->bounded(0, 256);
+                int b = QRandomGenerator::global()->bounded(0, 256);
+                balls[i].setTraceColor({r, g, b});
+                balls[j].setTraceColor({255 - r, 255 - g, 255 - b});
+            }
+        }
+
+        // Find cell that contains ball center
+        int centerCol = static_cast<int>(balls[i].x()) / cellSize;
+        int centerRow = static_cast<int>(balls[i].y()) / cellSize;
+
+        // Find bounds of cell grid to check for collision with weapon
+        int upperBound = std::max(0, centerRow - wCFS);
+        int lowerBound = std::min(rows - 1, centerRow + wCFS);
+        int leftBound = std::max(0, centerCol - wCFS);
+        int rightBound = std::min(cols - 1, centerCol + wCFS);
+
+        for (int x = leftBound; x <= rightBound; x++) {
+            for (int y = upperBound; y <= lowerBound; y++) {
+                QPointF leftUpper(x * cellSize, y * cellSize);
+                QPointF rightLower((x + 1) * cellSize, (y + 1) * cellSize);
+                if (balls[i].detectCellCollision(leftUpper, rightLower)) {
+                    visited[y][x] = balls[i].traceColor();
+                }
+            }
+        }
+    }
+
+    update();
+}
