@@ -61,7 +61,11 @@ void BallGridWidget::onTick()
 {
     const double dt = 0.016;
 
-    for (int i = 0; i < balls.size(); i++) {
+    for (int i = 0; i < balls.size();) {
+        if (balls[i].health() <= 0) {
+            balls.remove(i);
+            continue;
+        }
         balls[i].move(dt);
         balls[i].resolveCollision(field);
 
@@ -85,17 +89,20 @@ void BallGridWidget::onTick()
         int leftBound = std::max(0, centerCol - wCFS);
         int rightBound = std::min(cols - 1, centerCol + wCFS);
 
+        bool collided = false;
+        //TODO: split cell coloring and cell collision
         for (int x = leftBound; x <= rightBound; x++) {
             for (int y = upperBound; y <= lowerBound; y++) {
                 QRectF cell(x * cellSize, y * cellSize, cellSize, cellSize);
                 if (balls[i].detectCellCollision(cell)) {
                     visited[y][x] = balls[i].traceColor();
                 }
-                if (balls[i].traceColor() != visited[y][x]) {
+                if (balls[i].traceColor() != visited[y][x] && !collided) {
                     balls[i].resolveCellCollision(cell);
                 }
             }
         }
+        ++i;
     }
 
     update();

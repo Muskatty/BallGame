@@ -6,22 +6,6 @@
 
 bool Ball::detectCellCollision(const QRectF& cell) const
 {
-    // qreal x = center.x();
-    // qreal y = center.y();
-
-    // //is center inside
-    // if (x >= leftUpper.x() && x <= rightLower.x()
-    //     && y <= leftUpper.y() && y >= rightLower.y()) {
-    //     return true;
-    // }
-
-    // qreal distanceX = std::min(std::abs(x - leftUpper.x()), std::abs(x - rightLower.x()));
-    // qreal distanceY = std::min(std::abs(y - leftUpper.y()), std::abs(y - rightLower.y()));
-
-    // if (distanceX * distanceX + distanceY * distanceY < r * r) {
-    //     return true;
-    // }
-
     return weapon->detectCellCollision(cell);
 }
 
