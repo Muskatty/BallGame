@@ -8,9 +8,9 @@ qt_standard_project_setup()
 qt_add_executable(BallGame
     WIN32 MACOSX_BUNDLE
     main.cpp
-    mainwindow.cpp
-    mainwindow.h
-    mainwindow.ui
+    ballgrid.cpp
+    ballgrid.h
+    ballgrid.ui
     ball.h ball.cpp
     weapon.h weapon.cpp
     geometry.h geometry.cpp

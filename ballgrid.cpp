@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+#include "ballgrid.h"
 #include "QRandomGenerator"
 
 BallGridWidget::BallGridWidget(QWidget* parent) : QWidget(parent)
@@ -6,16 +6,30 @@ BallGridWidget::BallGridWidget(QWidget* parent) : QWidget(parent)
     setFixedSize(windowWidth, windowHeight);
 
     visited.resize(rows, std::vector<QColor>(cols, QColor(60, 60, 60)));
+    for (int i = 0; i < rows / 2; i++) {
+        for (int j = 0; j < cols / 2; j++) {
+            visited[i][j] = Qt::red;
+        }
+    }
+    for (int i = rows / 2 + 1; i < rows; i++) {
+        for (int j = 0; j < cols /2; j++) {
+            visited[i][j] = Qt::green;
+        }
+    }
 
-    balls.push_back(Ball(QPointF(100.0, 100.0), QPointF(240.0, 240.0), 20.0));
-    balls.push_back(Ball(QPointF(100.0, 500.0), QPointF(240.0, 240.0), 20.0));
-    balls.push_back(Ball(QPointF(500.0, 500.0), QPointF(240.0, 240.0), 20.0));
+    for (int i = 0; i < rows / 2; i++) {
+        for (int j = cols / 2 + 1; j< cols; j++) {
+            visited[i][j] = Qt::yellow;
+        }
+    }
+
+    balls.push_back(Ball(QPointF(100.0, 100.0), QPointF(140.0, 140.0), 20.0));
+    balls.push_back(Ball(QPointF(100.0, 500.0), QPointF(140.0, 140.0), 20.0));
+    balls.push_back(Ball(QPointF(500.0, 100.0), QPointF(140.0, 140.0), 20.0));
     balls[0].setWeaponLen(weaponLen);
     balls[1].setTraceColor(Qt::green);
-    balls[1].accelerate(20.0);
     balls[1].setWeaponLen(weaponLen);
     balls[2].setTraceColor(Qt::yellow);
-    balls[2].accelerate(30.0);
     balls[2].setWeaponLen(weaponLen);
     field = QRectF(0.0, 0.0, windowWidth, windowHeight);
 
@@ -52,13 +66,7 @@ void BallGridWidget::onTick()
         balls[i].resolveCollision(field);
 
         for (int j = i + 1; j < balls.size(); j++) {
-            if (balls[i].bounceOff(balls[j])) {
-                int r = QRandomGenerator::global()->bounded(0, 256);
-                int g = QRandomGenerator::global()->bounded(0, 256);
-                int b = QRandomGenerator::global()->bounded(0, 256);
-                balls[i].setTraceColor({r, g, b});
-                balls[j].setTraceColor({255 - r, 255 - g, 255 - b});
-            }
+            balls[i].bounceOff(balls[j]);
         }
 
         // Find cell that contains ball center
@@ -73,10 +81,12 @@ void BallGridWidget::onTick()
 
         for (int x = leftBound; x <= rightBound; x++) {
             for (int y = upperBound; y <= lowerBound; y++) {
-                QPointF leftUpper(x * cellSize, y * cellSize);
-                QPointF rightLower((x + 1) * cellSize, (y + 1) * cellSize);
-                if (balls[i].detectCellCollision(leftUpper, rightLower)) {
+                QRectF cell(x * cellSize, y * cellSize, cellSize, cellSize);
+                if (balls[i].detectCellCollision(cell)) {
                     visited[y][x] = balls[i].traceColor();
+                }
+                if (balls[i].traceColor() != visited[y][x]) {
+                    balls[i].resolveCellCollision(cell);
                 }
             }
         }

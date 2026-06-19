@@ -1,5 +1,5 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef BALLGRID_H
+#define BALLGRID_H
 
 #include "ball.h"
 

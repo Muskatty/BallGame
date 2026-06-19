@@ -19,7 +19,7 @@ public:
         center(center_),
         velocity(velocity_),
         r(radius_) {
-        weapon = std::make_unique<Weapon>(center, 180.0, 16.0, 60.0);
+        weapon = std::make_unique<Weapon>(center, 270.0, 16.0, 60.0);
     };
 
     qreal x() const {return center.x();};
@@ -33,7 +33,8 @@ public:
     void setWeaponLen(qreal len) {weapon->setLen(len);};
     void accelerate(qreal accel);
 
-    bool detectCellCollision(const QPointF& leftUpper, const QPointF& rightLower) const;
+    bool detectCellCollision(const QRectF& cell) const;
+    bool resolveCellCollision(const QRectF& cell);
     bool bounceOff(Ball& other);
     CollisionResult resolveCollision(const QRectF& field);
 

@@ -1,7 +1,7 @@
 #include "ball.h"
 #include "geometry.h"
 
-bool Ball::detectCellCollision(const QPointF& leftUpper, const QPointF& rightLower) const
+bool Ball::detectCellCollision(const QRectF& cell) const
 {
     // qreal x = center.x();
     // qreal y = center.y();
@@ -19,10 +19,64 @@ bool Ball::detectCellCollision(const QPointF& leftUpper, const QPointF& rightLow
     //     return true;
     // }
 
-    return weapon->detectCellCollision({leftUpper.x(),
-                                        leftUpper.y(),
-                                        rightLower.x() - leftUpper.x(),
-                                        rightLower.y() - leftUpper.y()});
+    return weapon->detectCellCollision(cell);
+}
+
+bool Ball::resolveCellCollision(const QRectF& cell)
+{
+    const qreal closestX = std::clamp(center.x(), cell.left(), cell.right());
+    const qreal closestY = std::clamp(center.y(), cell.top(), cell.bottom());
+
+    const qreal dx = center.x() - closestX;
+    const qreal dy = center.y() - closestY;
+
+    const qreal dist2 = dx * dx + dy * dy;
+    const qreal r2 = r * r;
+
+    if (dist2 > r2) {
+        return false;
+    }
+
+    if (cell.contains(center)) {
+        const qreal dl = center.x() - cell.left();
+        const qreal dr = cell.right() - center.x();
+        const qreal dt = center.y() - cell.top();
+        const qreal db = cell.bottom() - center.y();
+
+        const qreal m = std::min({dl, dr, dt, db});
+
+        if (m == dl) {
+            center.setX(cell.left() - r);
+            velocity.setX(-std::abs(velocity.x()));
+        } else if (m == dr) {
+            center.setX(cell.right() + r);
+            velocity.setX(std::abs(velocity.x()));
+        } else if (m == dt) {
+            center.setY(cell.top() - r);
+            velocity.setY(-std::abs(velocity.y()));
+        } else {
+            center.setY(cell.bottom() + r);
+            velocity.setY(std::abs(velocity.y()));
+        }
+
+        return true;
+    }
+
+    qreal dist = std::sqrt(dist2);
+    if (dist == 0.0) {
+        velocity.setX(-velocity.x());
+        return true;
+    }
+
+    const QPointF n = Geometry::normalized({dx, dy});
+
+    const qreal penetration = r - dist;
+    center += QPointF(n.x() * penetration, n.y() * penetration);
+
+    const qreal vn = velocity.x() * n.x() + velocity.y() * n.y();
+    velocity -= QPointF(2.0 * vn * n.x(), 2.0 * vn * n.y());
+
+    return true;
 }
 
 bool Ball::bounceOff(Ball& other)
