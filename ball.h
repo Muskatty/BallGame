@@ -14,20 +14,26 @@ struct CollisionResult {
 class Ball
 {
 public:
-    Ball() : center(0, 0), velocity(0, 0), r(0) {};
+    Ball() : cntr(0, 0), vel(0, 0), r(0) {};
     Ball(QPointF center_, QPointF velocity_, qreal radius_):
-        center(center_),
-        velocity(velocity_),
+        cntr(center_),
+        vel(velocity_),
         r(radius_) {
-        weapon = std::make_unique<Weapon>(center, 270.0, 16.0, 60.0);
+        weapon = std::make_unique<Weapon>(cntr, 270.0, 16.0, 60.0);
     };
 
-    qreal x() const {return center.x();};
-    qreal y() const {return center.y();};
+    QPointF center() const {return cntr;};
+    QPointF velocity() const {return vel;};
+    qreal x() const {return cntr.x();};
+    qreal y() const {return cntr.y();};
     qreal radius() const {return r;};
-    qreal weaponLen() const {return weapon->len();};
+    int health() const {return hp;};
+    qreal weaponLen() const {return weapon->length();};
     QColor traceColor() const {return tColor;};
+    Weapon* getWeapon() const {return weapon.get();};
 
+    void setCenter(const QPointF& p) {cntr = p;};
+    void setVelocity(const QPointF& v) {vel = v;};
     void setTraceColor(const QColor color) {tColor = color;};
     void setColor(const QColor color) {this->color = color;};
     void setWeaponLen(qreal len) {weapon->setLen(len);};
@@ -36,6 +42,7 @@ public:
     bool detectCellCollision(const QRectF& cell) const;
     bool resolveCellCollision(const QRectF& cell);
     bool bounceOff(Ball& other);
+    bool bounceOffWeapon(Ball& other);
     CollisionResult resolveCollision(const QRectF& field);
 
     void draw(QPainter& p);
@@ -43,9 +50,10 @@ public:
 
 private:
     std::shared_ptr<Weapon> weapon;
-    QPointF center;
-    QPointF velocity;
+    QPointF cntr;
+    QPointF vel;
     qreal r;
+    int hp = 100;
     QColor tColor = Qt::red;
     QColor color = Qt::white;
 };

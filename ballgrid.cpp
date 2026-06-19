@@ -26,11 +26,11 @@ BallGridWidget::BallGridWidget(QWidget* parent) : QWidget(parent)
     balls.push_back(Ball(QPointF(100.0, 100.0), QPointF(140.0, 140.0), 20.0));
     balls.push_back(Ball(QPointF(100.0, 500.0), QPointF(140.0, 140.0), 20.0));
     balls.push_back(Ball(QPointF(500.0, 100.0), QPointF(140.0, 140.0), 20.0));
-    balls[0].setWeaponLen(weaponLen);
+    balls[0].setWeaponLen(weaponLen * 3);
     balls[1].setTraceColor(Qt::green);
-    balls[1].setWeaponLen(weaponLen);
+    balls[1].setWeaponLen(weaponLen * 4);
     balls[2].setTraceColor(Qt::yellow);
-    balls[2].setWeaponLen(weaponLen);
+    balls[2].setWeaponLen(weaponLen * 2);
     field = QRectF(0.0, 0.0, windowWidth, windowHeight);
 
     timer.setInterval(16); // ~60 FPS
@@ -65,6 +65,11 @@ void BallGridWidget::onTick()
         balls[i].move(dt);
         balls[i].resolveCollision(field);
 
+        for (int j = 0; j < balls.size(); j++) {
+            balls[i].bounceOffWeapon(balls[j]);
+            balls[i].getWeapon()->bounceOffWeapon(*balls[j].getWeapon());
+        }
+
         for (int j = i + 1; j < balls.size(); j++) {
             balls[i].bounceOff(balls[j]);
         }
@@ -74,6 +79,7 @@ void BallGridWidget::onTick()
         int centerRow = static_cast<int>(balls[i].y()) / cellSize;
 
         // Find bounds of cell grid to check for collision with weapon
+        int wCFS = balls[i].weaponLen() / cellSize + 1;
         int upperBound = std::max(0, centerRow - wCFS);
         int lowerBound = std::min(rows - 1, centerRow + wCFS);
         int leftBound = std::max(0, centerCol - wCFS);

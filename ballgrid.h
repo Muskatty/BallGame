@@ -25,8 +25,6 @@ private:
     static constexpr int rows = windowHeight / cellSize;
     static constexpr double ballRadius = 12.0;
     static constexpr double weaponLen = 60.0;
-    static constexpr int bCFS = ballRadius / cellSize + 1; //ballCollisionFieldSize
-    static constexpr int wCFS = weaponLen / cellSize + 1; //weaponCollisionFieldSize
 
     QTimer timer;
     QVector<Ball> balls;
