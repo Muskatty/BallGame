@@ -67,7 +67,7 @@ void BallGridWidget::onTick()
             continue;
         }
         balls[i].move(dt);
-        balls[i].resolveCollision(field);
+        balls[i].resolveFieldCollision(field);
 
         for (int j = 0; j < balls.size(); j++) {
             balls[i].bounceOffWeapon(balls[j]);

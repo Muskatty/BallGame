@@ -43,7 +43,7 @@ public:
     bool resolveCellCollision(const QRectF& cell);
     bool bounceOff(Ball& other);
     bool bounceOffWeapon(Ball& other);
-    CollisionResult resolveCollision(const QRectF& field);
+    CollisionResult resolveFieldCollision(const QRectF& field);
 
     void draw(QPainter& p);
     void move(const qreal dt);

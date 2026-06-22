@@ -68,28 +68,18 @@ bool Ball::resolveCellCollision(const QRectF& cell)
 
 bool Ball::bounceOff(Ball& other)
 {
-    QPointF delta = cntr - other.cntr;
+    Collision::CollisionInfo coll = Collision::circleCircle(cntr, r, other.cntr, other.r);
 
-    qreal dist2 = delta.x() * delta.x() + delta.y() * delta.y();
-    qreal minDist = r + other.r;
-
-    if (dist2 > minDist * minDist) {
+    if (!coll.hit) {
         return false;
     }
 
-    qreal dist = std::sqrt(dist2);
-
-    if (dist == 0.0) {
-        delta = QPointF(1.0, 0.0);
-        dist = 1.0;
-    }
-
-    QPointF normal(delta.x() / dist, delta.y() / dist);
+    QPointF normal = coll.normal;
+    qreal overlap = coll.overlap;
 
     qreal speed1 = Geometry::length(vel);
     qreal speed2 = Geometry::length(other.vel);
 
-    qreal overlap = minDist - dist;
     cntr += QPointF(normal.x() * overlap * 0.5, normal.y() * overlap * 0.5);
     other.cntr -= QPointF(normal.x() * overlap * 0.5, normal.y() * overlap * 0.5);
 
@@ -116,73 +106,35 @@ bool Ball::bounceOffWeapon(Ball& other) {
         return false;
     }
 
-    constexpr qreal EPS = 1e-9;
-    Weapon *w = other.weapon.get();
-
-    QTransform toWorld;
-    toWorld.translate(w->pos().x(), w->pos().y());
-    toWorld.rotate(w->angle());
-
-    bool invertible = false;
-    QTransform toLocal = toWorld.inverted(&invertible);
-    if (!invertible) {
+    Weapon* w = other.weapon.get();
+    if (!w) {
         return false;
     }
 
-    const QRectF rect(-w->width() / 2.0, -w->length(), w->width(), w->length());
-    const QPointF c = toLocal.map(cntr);
+    QTransform weaponTransform;
+    weaponTransform.translate(w->pos().x(), w->pos().y());
+    weaponTransform.rotate(w->angle());
 
-    const QPointF closest(
-        std::clamp(c.x(), rect.left(), rect.right()),
-        std::clamp(c.y(), rect.top(), rect.bottom()));
+    const QRectF weaponRect(-w->width() / 2.0, -w->length(), w->width(), w->length());
 
-    QPointF delta(c.x() - closest.x(), c.y() - closest.y());
-    qreal dist2 = delta.x() * delta.x() + delta.y() * delta.y();
+    const Collision::CollisionInfo coll =
+        Collision::circleRect(cntr, r, weaponRect, weaponTransform);
 
-    if (dist2 > r * r) {
+    if (!coll.hit) {
         w->setTouching(this, false);
         return false;
     }
 
-    QPointF normalLocal;
-
-    if (dist2 > EPS) {
-        normalLocal = Geometry::normalized(delta);
-    } else {
-        const qreal dl = std::abs(c.x() - rect.left());
-        const qreal dr = std::abs(rect.right() - c.x());
-        const qreal dt = std::abs(c.y() - rect.top());
-        const qreal db = std::abs(rect.bottom() - c.y());
-
-        const qreal m = std::min({dl, dr, dt, db});
-
-        if (m == dl)      normalLocal = QPointF(-1.0, 0.0);
-        else if (m == dr) normalLocal = QPointF( 1.0, 0.0);
-        else if (m == dt) normalLocal = QPointF(0.0, -1.0);
-        else              normalLocal = QPointF(0.0,  1.0);
-    }
-
-    QTransform rot;
-    rot.rotate(w->angle());
-    QPointF normalWorld = rot.map(normalLocal);
-
-    qreal nLen = std::hypot(normalWorld.x(), normalWorld.y());
-    if (nLen > EPS) {
-        normalWorld = QPointF(normalWorld.x() / nLen, normalWorld.y() / nLen);
-    }
-
-    qreal dist = std::sqrt(std::max(dist2, EPS));
-    qreal penetration = r - dist;
-    if (penetration > 0.0) {
-        cntr += QPointF(normalWorld.x() * penetration, normalWorld.y() * penetration);
+    if (coll.overlap > 0.0) {
+        cntr += QPointF(coll.normal.x() * coll.overlap,
+                        coll.normal.y() * coll.overlap);
     }
 
     const bool firstTouch = !w->isTouching(this);
 
-    qreal vn = vel.x() * normalWorld.x() + vel.y() * normalWorld.y();
-
+    const qreal vn = vel.x() * coll.normal.x() + vel.y() * coll.normal.y();
     if (vn < 0.0) {
-        vel -= QPointF(2.0 * vn * normalWorld.x(), 2.0 * vn * normalWorld.y());
+        vel -= QPointF(2.0 * vn * coll.normal.x(), 2.0 * vn * coll.normal.y());
     }
 
     if (firstTouch) {
@@ -194,7 +146,7 @@ bool Ball::bounceOffWeapon(Ball& other) {
     return true;
 }
 
-CollisionResult Ball::resolveCollision(const QRectF& field)
+CollisionResult Ball::resolveFieldCollision(const QRectF& field)
 {
     CollisionResult res;
 

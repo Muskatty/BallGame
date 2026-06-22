@@ -42,6 +42,7 @@ private:
     qreal vel = 180.0;
     qreal w = 4.0;
     qreal l = 7.0;
+    qreal prevAngl = 0.0;
     qreal angl = 0.0;
     int dmg = 10;
     QSet<const Ball*> touchingBalls;

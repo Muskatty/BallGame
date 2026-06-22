@@ -1,11 +1,14 @@
 #include "weapon.h"
+#include "geometry.h"
 #include <QPainterPath>
+#include <qdebug.h>
 
 void Weapon::updatePos(const QPointF& pos) {
     targetPos = pos;
 }
 
 void Weapon::move(const qreal dt) {
+    prevAngl = angl;
     angl += vel * dt;
     if (angl > 360.0) {
         angl -= 360.0;
@@ -30,26 +33,18 @@ void Weapon::draw(QPainter& painter) {
 
 bool Weapon::detectCellCollision(const QRectF& cellRect) const
 {
-    QTransform transform;
-    transform.translate(targetPos.x(), targetPos.y());
-    transform.rotate(angl);
+    const QRectF weaponRect(-w / 2.0, -l, w, l);
 
-    QPolygonF weaponPoly;
-    weaponPoly << QPointF(-w / 2.0, -l)
-               << QPointF( w / 2.0, -l)
-               << QPointF( w / 2.0, 0.0)
-               << QPointF(-w / 2.0, 0.0);
+    QTransform weaponTransform;
+    weaponTransform.translate(targetPos.x(), targetPos.y());
+    weaponTransform.rotate(angl);
 
-    weaponPoly = transform.map(weaponPoly);
+    const QTransform cellTransform;
 
-    QPainterPath weaponPath;
-    weaponPath.addPolygon(weaponPoly);
-    weaponPath.closeSubpath();
+    const Collision::CollisionInfo coll =
+        Collision::rectRect(weaponRect, weaponTransform, cellRect, cellTransform);
 
-    QPainterPath cellPath;
-    cellPath.addRect(cellRect);
-
-    return weaponPath.intersects(cellPath);
+    return coll.hit;
 }
 
 void Weapon::setTouching(const Ball* b, bool value) {
@@ -85,26 +80,9 @@ bool Weapon::bounceOffWeapon(Weapon& other)
     t2.translate(other.pos().x(), other.pos().y());
     t2.rotate(other.angle());
 
-    QPolygonF poly1;
-    poly1 << rect1.topLeft()     << rect1.topRight()
-          << rect1.bottomRight() << rect1.bottomLeft();
+    const Collision::CollisionInfo coll = Collision::rectRect(rect1, t1, rect2, t2);
 
-    QPolygonF poly2;
-    poly2 << rect2.topLeft()     << rect2.topRight()
-          << rect2.bottomRight() << rect2.bottomLeft();
-
-    poly1 = t1.map(poly1);
-    poly2 = t2.map(poly2);
-
-    QPainterPath path1;
-    path1.addPolygon(poly1);
-    path1.closeSubpath();
-
-    QPainterPath path2;
-    path2.addPolygon(poly2);
-    path2.closeSubpath();
-
-    if (!path1.intersects(path2)) {
+    if (!coll.hit) {
         setTouching(&other, false);
         other.setTouching(this, false);
         return false;
@@ -116,6 +94,10 @@ bool Weapon::bounceOffWeapon(Weapon& other)
     other.setTouching(this, true);
 
     if (firstTouch) {
+        if (coll.overlap > 0.05) {
+            angl = prevAngl;
+            other.angl = other.prevAngl;
+        }
         invertVelocity();
         other.invertVelocity();
     }
