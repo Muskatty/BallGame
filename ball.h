@@ -20,7 +20,7 @@ public:
         cntr(center_),
         vel(velocity_),
         r(radius_) {
-        weapon = std::make_unique<Weapon>(cntr, 270.0, 16.0, 60.0);
+        weapon = std::make_shared<Weapon>(cntr, 270.0, 16.0, 60.0);
     };
 
     QPointF center() const {return cntr;};
@@ -30,6 +30,7 @@ public:
     qreal radius() const {return r;};
     int health() const {return hp;};
     qreal weaponLen() const {return weapon->length();};
+    int weaponDmg() const {return weapon->damage();};
     QColor traceColor() const {return tColor;};
     Weapon* getWeapon() const {return weapon.get();};
 
@@ -40,8 +41,9 @@ public:
     void setWeaponLen(qreal len) {weapon->setLen(len);};
     void accelerate(qreal accel);
     void acceleratePercent(qreal percent);
+    void takeDamage(int dmg) {hp -= dmg;};
 
-    bool detectCellCollision(const QRectF& cell) const;
+    bool detectCellWeaponCollision(const QRectF& cell) const;
     bool resolveCellCollision(const QRectF& cell);
     bool bounceOff(Ball& other);
     bool bounceOffWeapon(Ball& other);

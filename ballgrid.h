@@ -2,6 +2,8 @@
 #define BALLGRID_H
 
 #include "ball.h"
+#include "power.h"
+#include "holypower.h"
 
 #include <QWidget>
 #include <QTimer>
@@ -26,9 +28,12 @@ private:
     static constexpr double ballRadius = 12.0;
     static constexpr double weaponLen = 60.0;
 
+    qreal powersPotency = 1.0;
+
     QTimer timer;
     QVector<Ball> balls;
     QVector<Upgrade> upgrades;
+    QVector<std::shared_ptr<Power>> powers;
     QRectF field;
     std::vector<std::vector<QColor>> visited;
 };

@@ -48,6 +48,10 @@ void BallGridWidget::paintEvent(QPaintEvent*)
         }
     }
 
+    for (auto& power : powers) {
+        power->draw(painter);
+    }
+
     for (auto& upgrade : upgrades) {
         upgrade.draw(painter);
     }
@@ -60,6 +64,7 @@ void BallGridWidget::paintEvent(QPaintEvent*)
 void BallGridWidget::onTick()
 {
     const double dt = 0.016;
+    powersPotency += dt * 0.05;
 
     for (int i = 0; i < balls.size();) {
         if (balls[i].health() <= 0) {
@@ -80,9 +85,24 @@ void BallGridWidget::onTick()
 
         for (int j = 0; j < upgrades.size();) {
             if (balls[i].resolveUpgradeCollision(upgrades[j])) {
+                if (upgrades[j].type() == UpgradeType::Power) {
+                    std::shared_ptr<Power> tmp = std::make_shared<HolyPower>(balls[i], powersPotency);
+                    powers.push_back(std::move(tmp));
+                }
                 upgrades.removeAt(j);
                 continue;
             }
+            j++;
+        }
+
+        for (int j = 0; j < powers.size();) {
+            if (powers[j]->lifetime() < 0) {
+                powers.removeAt(j);
+                continue;
+            }
+            powers[j]->resolveBallCollision(balls[i]);
+            powers[j]->resolveFieldCollision(visited, windowWidth, windowHeight);
+            powers[j]->decreaseLife(dt);
             j++;
         }
 
@@ -92,24 +112,37 @@ void BallGridWidget::onTick()
 
         // Find bounds of cell grid to check for collision with weapon
         int wCFS = balls[i].weaponLen() / cellSize + 1;
-        int upperBound = std::max(0, centerRow - wCFS);
-        int lowerBound = std::min(rows - 1, centerRow + wCFS);
-        int leftBound = std::max(0, centerCol - wCFS);
-        int rightBound = std::min(cols - 1, centerCol + wCFS);
+        int upperWBound = std::max(0, centerRow - wCFS);
+        int lowerWBound = std::min(rows - 1, centerRow + wCFS);
+        int leftWBound = std::max(0, centerCol - wCFS);
+        int rightWBound = std::min(cols - 1, centerCol + wCFS);
 
-        bool collided = false;
-        //TODO: split cell coloring and cell collision
-        for (int x = leftBound; x <= rightBound; x++) {
-            for (int y = upperBound; y <= lowerBound; y++) {
+        for (int x = leftWBound; x <= rightWBound; x++) {
+            for (int y = upperWBound; y <= lowerWBound; y++) {
                 QRectF cell(x * cellSize, y * cellSize, cellSize, cellSize);
-                if (balls[i].detectCellCollision(cell)) {
+                if (balls[i].detectCellWeaponCollision(cell)) {
                     visited[y][x] = balls[i].traceColor();
                 }
-                if (balls[i].traceColor() != visited[y][x] && !collided) {
+            }
+        }
+
+        // Find bounds of cell grid to check for collision with ball
+        int bCFS = balls[i].radius() / cellSize + 1;
+        int upperBBound = std::max(0, centerRow - bCFS);
+        int lowerBBound = std::min(rows - 1, centerRow + bCFS);
+        int leftBBound = std::max(0, centerCol - bCFS);
+        int rightBBound = std::min(cols - 1, centerCol + bCFS);
+
+        bool collided = false;
+        for (int x = leftBBound; x <= rightBBound && !collided; x++) {
+            for (int y = upperBBound; y <= lowerBBound && !collided; y++) {
+                QRectF cell(x * cellSize, y * cellSize, cellSize, cellSize);
+                if (balls[i].traceColor() != visited[y][x]) {
                     balls[i].resolveCellCollision(cell);
                 }
             }
         }
+
         ++i;
     }
 

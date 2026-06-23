@@ -4,7 +4,7 @@
 #include <cmath>
 #include <algorithm>
 
-bool Ball::detectCellCollision(const QRectF& cell) const
+bool Ball::detectCellWeaponCollision(const QRectF& cell) const
 {
     return weapon->detectCellCollision(cell);
 }
@@ -123,6 +123,8 @@ bool Ball::resolveUpgradeCollision(Upgrade& other) {
         break;
     case UpgradeType::WeaponSize:
         weapon->sizeUp(WeaponSizeBonus);
+        break;
+    case UpgradeType::Power:
         break;
     }
 

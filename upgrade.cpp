@@ -2,8 +2,11 @@
 #include <QRandomGenerator>
 
 Upgrade::Upgrade(QPointF fieldSize) {
-    qreal x = QRandomGenerator::global()->bounded(fieldSize.x());
-    qreal y = QRandomGenerator::global()->bounded(fieldSize.y());
+    int lower = static_cast<int>(r);
+    int upperX = static_cast<int>(fieldSize.x() - r);
+    int upperY = static_cast<int>(fieldSize.y() - r);
+    qreal x = QRandomGenerator::global()->bounded(lower, upperX);
+    qreal y = QRandomGenerator::global()->bounded(lower, upperY);
     position = QPointF(x, y);
 
     int ty = QRandomGenerator::global()->bounded((int)UpgradeType::Count);
