@@ -14,6 +14,7 @@ qt_add_executable(BallGame
     ball.h ball.cpp
     weapon.h weapon.cpp
     geometry.h geometry.cpp
+    upgrade.h upgrade.cpp
 )
 
 target_link_libraries(BallGame

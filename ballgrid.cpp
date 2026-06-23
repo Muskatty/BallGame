@@ -1,5 +1,4 @@
 #include "ballgrid.h"
-#include "QRandomGenerator"
 
 BallGridWidget::BallGridWidget(QWidget* parent) : QWidget(parent)
 {
@@ -26,11 +25,8 @@ BallGridWidget::BallGridWidget(QWidget* parent) : QWidget(parent)
     balls.push_back(Ball(QPointF(100.0, 100.0), QPointF(140.0, 140.0), 20.0));
     balls.push_back(Ball(QPointF(100.0, 500.0), QPointF(140.0, 140.0), 20.0));
     balls.push_back(Ball(QPointF(500.0, 100.0), QPointF(140.0, 140.0), 20.0));
-    balls[0].setWeaponLen(weaponLen * 3);
     balls[1].setTraceColor(Qt::green);
-    balls[1].setWeaponLen(weaponLen * 4);
     balls[2].setTraceColor(Qt::yellow);
-    balls[2].setWeaponLen(weaponLen * 2);
     field = QRectF(0.0, 0.0, windowWidth, windowHeight);
 
     timer.setInterval(16); // ~60 FPS
@@ -50,6 +46,10 @@ void BallGridWidget::paintEvent(QPaintEvent*)
 
             painter.fillRect(cellRect, visited[y][x]);
         }
+    }
+
+    for (auto& upgrade : upgrades) {
+        upgrade.draw(painter);
     }
 
     for (auto& ball : balls) {
@@ -78,6 +78,14 @@ void BallGridWidget::onTick()
             balls[i].bounceOff(balls[j]);
         }
 
+        for (int j = 0; j < upgrades.size();) {
+            if (balls[i].resolveUpgradeCollision(upgrades[j])) {
+                upgrades.removeAt(j);
+                continue;
+            }
+            j++;
+        }
+
         // Find cell that contains ball center
         int centerCol = static_cast<int>(balls[i].x()) / cellSize;
         int centerRow = static_cast<int>(balls[i].y()) / cellSize;
@@ -103,6 +111,10 @@ void BallGridWidget::onTick()
             }
         }
         ++i;
+    }
+
+    if (QRandomGenerator::global()->bounded(200) == 1 && upgrades.size() < 6) {
+        upgrades.push_back(Upgrade({windowWidth, windowHeight}));
     }
 
     update();

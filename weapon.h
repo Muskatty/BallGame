@@ -32,6 +32,10 @@ public:
     void setTouching(const Ball* b, bool value);
     void setTouching(const Weapon* b, bool value);
 
+    void accelerate(qreal accel) {vel = vel >= 0 ? vel + accel : vel - accel;};
+    void dmgUp(int up) {dmg += up;};
+    void sizeUp(qreal szUp) {w += szUp * 0.25; l += szUp;};
+
     void updatePos(const QPointF& pos);
     void move(const qreal dt);
     void draw(QPainter& painter);

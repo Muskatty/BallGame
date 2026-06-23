@@ -101,6 +101,34 @@ bool Ball::bounceOff(Ball& other)
     return true;
 }
 
+bool Ball::resolveUpgradeCollision(Upgrade& other) {
+    Collision::CollisionInfo coll = Collision::circleCircle(cntr, r, other.pos(), other.radius());
+
+    if (!coll.hit) {
+        return false;
+    }
+
+    switch (other.type()) {
+    case UpgradeType::Health:
+        hp += HealthBonus;
+        break;
+    case UpgradeType::Speed:
+        acceleratePercent(SpeedPercentBonus);
+        break;
+    case UpgradeType::SpinSpeed:
+        weapon->accelerate(SpinSpeedBonus);
+        break;
+    case UpgradeType::Strength:
+        weapon->dmgUp(StrengthBonus);
+        break;
+    case UpgradeType::WeaponSize:
+        weapon->sizeUp(WeaponSizeBonus);
+        break;
+    }
+
+    return true;
+}
+
 bool Ball::bounceOffWeapon(Ball& other) {
     if (this == &other) {
         return false;
@@ -176,6 +204,11 @@ CollisionResult Ball::resolveFieldCollision(const QRectF& field)
 void Ball::accelerate(qreal accel) {
     vel.setX(vel.x() + accel);
     vel.setY(vel.y() + accel);
+}
+
+void Ball::acceleratePercent(qreal percent) {
+    vel.setX(vel.x() * (1 + percent));
+    vel.setY(vel.y() * (1 + percent));
 }
 
 void Ball::draw(QPainter& painter)

@@ -8,7 +8,7 @@
 #include <QPointF>
 #include <QPainter>
 #include <vector>
-
+#include <QRandomGenerator>
 class BallGridWidget : public QWidget {
 public:
     BallGridWidget(QWidget *parent = nullptr);
@@ -28,6 +28,7 @@ private:
 
     QTimer timer;
     QVector<Ball> balls;
+    QVector<Upgrade> upgrades;
     QRectF field;
     std::vector<std::vector<QColor>> visited;
 };

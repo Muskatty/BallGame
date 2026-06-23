@@ -2,6 +2,7 @@
 #define BALL_H
 
 #include "weapon.h"
+#include "upgrade.h"
 #include <QPointF>
 #include <QRectF>
 #include <QPainter>
@@ -38,11 +39,13 @@ public:
     void setColor(const QColor color) {this->color = color;};
     void setWeaponLen(qreal len) {weapon->setLen(len);};
     void accelerate(qreal accel);
+    void acceleratePercent(qreal percent);
 
     bool detectCellCollision(const QRectF& cell) const;
     bool resolveCellCollision(const QRectF& cell);
     bool bounceOff(Ball& other);
     bool bounceOffWeapon(Ball& other);
+    bool resolveUpgradeCollision(Upgrade& other);
     CollisionResult resolveFieldCollision(const QRectF& field);
 
     void draw(QPainter& p);
