@@ -30,12 +30,12 @@ public:
     void decreaseLife(qreal dt) {lifet -= dt;};
 
 protected:
-    static constexpr qreal maxlife = 1.0;
+    qreal maxlife;
 
     Ball& parent;
     qreal vel;
     QPointF position;
-    qreal lifet = maxlife;
+    qreal lifet;
     qreal potency = 1.0;
 };
 

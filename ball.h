@@ -42,6 +42,7 @@ public:
     void accelerate(qreal accel);
     void acceleratePercent(qreal percent);
     void takeDamage(int dmg) {hp -= dmg;};
+    void applyUpgrade(UpgradeType type);
 
     bool detectCellWeaponCollision(const QRectF& cell) const;
     bool resolveCellCollision(const QRectF& cell);

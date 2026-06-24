@@ -17,6 +17,13 @@ public:
 protected:
     void paintEvent(QPaintEvent*) override;
 private:
+    void updateBalls(qreal dt);
+    void updatePowers(qreal dt);
+    void updateUpgrades();
+    void updateCells();
+
+    void trySpawnUpgrade();
+
     void onTick();
 
 private:

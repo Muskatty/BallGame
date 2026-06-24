@@ -101,6 +101,29 @@ bool Ball::bounceOff(Ball& other)
     return true;
 }
 
+void Ball::applyUpgrade(UpgradeType type) {
+    switch (type) {
+    case UpgradeType::Health:
+        hp += HealthBonus;
+        return;
+    case UpgradeType::Speed:
+        acceleratePercent(SpeedPercentBonus);
+        return;
+    case UpgradeType::SpinSpeed:
+        weapon->accelerate(SpinSpeedBonus);
+        return;
+    case UpgradeType::Strength:
+        weapon->dmgUp(StrengthBonus);
+        return;
+    case UpgradeType::WeaponSize:
+        weapon->sizeUp(WeaponSizeBonus);
+        return;
+    case UpgradeType::Power:
+    case UpgradeType::Count:
+        return;
+    }
+}
+
 bool Ball::resolveUpgradeCollision(Upgrade& other) {
     Collision::CollisionInfo coll = Collision::circleCircle(cntr, r, other.pos(), other.radius());
 
@@ -108,25 +131,7 @@ bool Ball::resolveUpgradeCollision(Upgrade& other) {
         return false;
     }
 
-    switch (other.type()) {
-    case UpgradeType::Health:
-        hp += HealthBonus;
-        break;
-    case UpgradeType::Speed:
-        acceleratePercent(SpeedPercentBonus);
-        break;
-    case UpgradeType::SpinSpeed:
-        weapon->accelerate(SpinSpeedBonus);
-        break;
-    case UpgradeType::Strength:
-        weapon->dmgUp(StrengthBonus);
-        break;
-    case UpgradeType::WeaponSize:
-        weapon->sizeUp(WeaponSizeBonus);
-        break;
-    case UpgradeType::Power:
-        break;
-    }
+    applyUpgrade(other.type());
 
     return true;
 }

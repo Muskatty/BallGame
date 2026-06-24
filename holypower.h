@@ -3,13 +3,21 @@
 
 #include "power.h"
 
+static constexpr qreal holyMaxLife = 0.33;
+
 class HolyPower : public Power
 {
 public:
-    HolyPower(Ball& p) : Power(p), rad(30.0) {};
-    HolyPower(Ball& p, qreal pot) : Power(p, pot), rad(30.0) {};
+    HolyPower(Ball& p) : Power(p), rad(30.0) {
+        maxlife = holyMaxLife;
+        lifet = maxlife;
+    };
+    HolyPower(Ball& p, qreal pot) : Power(p, pot), rad(30.0) {
+        maxlife = holyMaxLife;
+        lifet = maxlife;
+    };
 
-    qreal radius() {return rad * potency * (maxlife - lifet);};
+    qreal radius() {return rad * potency * (1 - (lifet / maxlife));};
 
     bool isTouching(const Ball* b) {
         return touchedBalls.contains(b);
