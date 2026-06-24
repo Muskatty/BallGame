@@ -37,6 +37,11 @@ BallGridWidget::BallGridWidget(QWidget* parent) : QWidget(parent)
     balls[3].setTraceColor(Qt::blue);
     field = QRectF(0.0, 0.0, windowWidth, windowHeight);
 
+#ifdef QT_DEBUG
+    debugWindow = new DebugWidget(this);
+    debugWindow->show();
+#endif
+
     timer.setInterval(16); // ~60 FPS
     connect(&timer, &QTimer::timeout, this, &BallGridWidget::onTick);
     timer.start();
@@ -82,6 +87,9 @@ void BallGridWidget::updateBalls(qreal dt) {
 
         //check collision with weapons
         for (int j = 0; j < balls.size(); j++) {
+            if (i == j) {
+                continue;
+            }
             balls[i].bounceOffWeapon(balls[j]);
             balls[i].getWeapon()->bounceOffWeapon(*balls[j].getWeapon());
         }
@@ -185,87 +193,6 @@ void BallGridWidget::onTick()
     const double dt = 0.016;
     powersPotency += dt * 0.05;
 
-    // for (int i = 0; i < balls.size();) {
-    //     if (balls[i].health() <= 0) {
-    //         balls.remove(i);
-    //         continue;
-    //     }
-    //     balls[i].move(dt);
-    //     balls[i].resolveFieldCollision(field);
-
-    //     for (int j = 0; j < balls.size(); j++) {
-    //         balls[i].bounceOffWeapon(balls[j]);
-    //         balls[i].getWeapon()->bounceOffWeapon(*balls[j].getWeapon());
-    //     }
-
-    //     for (int j = i + 1; j < balls.size(); j++) {
-    //         balls[i].bounceOff(balls[j]);
-    //     }
-
-    //     for (int j = 0; j < upgrades.size();) {
-    //         if (balls[i].resolveUpgradeCollision(upgrades[j])) {
-    //             if (upgrades[j].type() == UpgradeType::Power) {
-    //                 std::shared_ptr<Power> tmp = std::make_shared<HolyPower>(balls[i], powersPotency);
-    //                 powers.push_back(std::move(tmp));
-    //             }
-    //             upgrades.removeAt(j);
-    //             continue;
-    //         }
-    //         j++;
-    //     }
-
-    //     for (int j = 0; j < powers.size();) {
-    //         if (powers[j]->lifetime() < 0) {
-    //             powers.removeAt(j);
-    //             continue;
-    //         }
-    //         powers[j]->resolveBallCollision(balls[i]);
-    //         powers[j]->resolveFieldCollision(visited, windowWidth, windowHeight);
-    //         powers[j]->decreaseLife(dt);
-    //         j++;
-    //     }
-
-    //     // Find cell that contains ball center
-    //     int centerCol = static_cast<int>(balls[i].x()) / cellSize;
-    //     int centerRow = static_cast<int>(balls[i].y()) / cellSize;
-
-    //     // Find bounds of cell grid to check for collision with weapon
-    //     int wCFS = balls[i].weaponLen() / cellSize + 1;
-    //     int upperWBound = std::max(0, centerRow - wCFS);
-    //     int lowerWBound = std::min(rows - 1, centerRow + wCFS);
-    //     int leftWBound = std::max(0, centerCol - wCFS);
-    //     int rightWBound = std::min(cols - 1, centerCol + wCFS);
-
-    //     for (int x = leftWBound; x <= rightWBound; x++) {
-    //         for (int y = upperWBound; y <= lowerWBound; y++) {
-    //             QRectF cell(x * cellSize, y * cellSize, cellSize, cellSize);
-    //             if (balls[i].detectCellWeaponCollision(cell)) {
-    //                 visited[y][x] = balls[i].traceColor();
-    //             }
-    //         }
-    //     }
-
-    //     // Find bounds of cell grid to check for collision with ball
-    //     int bCFS = balls[i].radius() / cellSize + 1;
-    //     int upperBBound = std::max(0, centerRow - bCFS);
-    //     int lowerBBound = std::min(rows - 1, centerRow + bCFS);
-    //     int leftBBound = std::max(0, centerCol - bCFS);
-    //     int rightBBound = std::min(cols - 1, centerCol + bCFS);
-
-    //     bool collided = false;
-    //     for (int x = leftBBound; x <= rightBBound && !collided; x++) {
-    //         for (int y = upperBBound; y <= lowerBBound && !collided; y++) {
-    //             QRectF cell(x * cellSize, y * cellSize, cellSize, cellSize);
-    //             if (balls[i].traceColor() != visited[y][x]) {
-    //                 if (balls[i].resolveCellCollision(cell)) {
-    //                     collided = true;
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    //     ++i;
-    // }
     updateBalls(dt);
     updatePowers(dt);
     updateUpgrades();
@@ -275,3 +202,15 @@ void BallGridWidget::onTick()
 
     update();
 }
+
+#ifdef QT_DEBUG
+void BallGridWidget::giveUpgrade(int idx, UpgradeType type) {
+    if (idx >= balls.size()) {
+        return;
+    }
+    balls[idx].applyUpgrade(type);
+    if (type == UpgradeType::Power) {
+        powers.push_back(std::make_shared<HolyPower>(balls[idx], powersPotency));
+    }
+}
+#endif

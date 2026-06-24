@@ -4,6 +4,7 @@
 #include "ball.h"
 #include "power.h"
 #include "holypower.h"
+#include "debugwidget.h"
 
 #include <QWidget>
 #include <QTimer>
@@ -14,6 +15,14 @@
 class BallGridWidget : public QWidget {
 public:
     BallGridWidget(QWidget *parent = nullptr);
+#ifdef QT_DEBUG
+public:
+    int ballCount() const { return balls.size();};
+
+    void giveUpgrade(int idx, UpgradeType type);
+private:
+    DebugWidget* debugWindow = nullptr;
+#endif
 protected:
     void paintEvent(QPaintEvent*) override;
 private:
