@@ -210,7 +210,7 @@ void BallGridWidget::giveUpgrade(int idx, UpgradeType type) {
     }
     balls[idx].applyUpgrade(type);
     if (type == UpgradeType::Power) {
-        powers.push_back(std::make_shared<HolyPower>(balls[idx], powersPotency));
+        powers.push_back(std::make_shared<WaterPower>(balls[idx], powersPotency));
     }
 }
 #endif

@@ -4,6 +4,7 @@
 #include "ball.h"
 #include "power.h"
 #include "holypower.h"
+#include "waterpower.h"
 #include "debugwidget.h"
 
 #include <QWidget>

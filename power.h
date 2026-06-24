@@ -18,7 +18,6 @@ static std::unordered_map<PowerType, QColor> powerToColor = {
 class Power
 {
 public:
-    Power(Ball& p) : parent(p), position(p.center()) {};
     Power(Ball& p, qreal pot) : parent(p), position(p.center()), potency(pot) {};
     virtual ~Power() {};
 
@@ -27,7 +26,7 @@ public:
     virtual bool resolveFieldCollision(std::vector<std::vector<QColor>>& field, qreal width, qreal height) = 0;
 
     qreal lifetime() {return lifet;};
-    void decreaseLife(qreal dt) {lifet -= dt;};
+    virtual void decreaseLife(qreal dt) {lifet -= dt;};
 
 protected:
     qreal maxlife;
