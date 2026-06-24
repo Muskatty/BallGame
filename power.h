@@ -8,6 +8,7 @@
 
 enum class PowerType {
     Holy,
+    Water,
     Count
 };
 

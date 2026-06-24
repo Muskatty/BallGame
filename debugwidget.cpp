@@ -8,7 +8,7 @@
 #ifdef QT_DEBUG
 
 DebugWidget::DebugWidget(BallGridWidget *grid_, QWidget *parent)
-    : QWidget{parent}, grid(grid_)
+    : QWidget(parent), grid(grid_)
 {
     auto* layout = new QGridLayout(this);
 

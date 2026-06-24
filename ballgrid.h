@@ -13,6 +13,8 @@
 #include <QPainter>
 #include <vector>
 #include <QRandomGenerator>
+
+//TODO:: SPLIT GAME LOGIC AND WIDGET
 class BallGridWidget : public QWidget {
 public:
     BallGridWidget(QWidget *parent = nullptr);

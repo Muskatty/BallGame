@@ -66,7 +66,7 @@ bool Ball::resolveCellCollision(const QRectF& cell)
     return true;
 }
 
-bool Ball::bounceOff(Ball& other)
+bool Ball::bounceOffBall(Ball& other)
 {
     Collision::CollisionInfo coll = Collision::circleCircle(cntr, r, other.cntr, other.r);
 

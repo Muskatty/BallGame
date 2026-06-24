@@ -12,14 +12,17 @@ struct CollisionResult {
     bool hitY = false;
 };
 
+enum class PowerType;
+
 class Ball
 {
 public:
-    Ball() : cntr(0, 0), vel(0, 0), r(0) {};
-    Ball(QPointF center_, QPointF velocity_, qreal radius_):
+    Ball(QPointF center_, QPointF velocity_, qreal radius_, PowerType type):
         cntr(center_),
         vel(velocity_),
-        r(radius_) {
+        r(radius_),
+        pwr(type)
+    {
         weapon = std::make_shared<Weapon>(cntr, 270.0, 16.0, 60.0);
     };
 
@@ -31,6 +34,7 @@ public:
     int health() const {return hp;};
     qreal weaponLen() const {return weapon->length();};
     int weaponDmg() const {return weapon->damage();};
+    PowerType powerType() const {return pwr;};
     QColor traceColor() const {return tColor;};
     Weapon* getWeapon() const {return weapon.get();};
 
@@ -39,6 +43,7 @@ public:
     void setTraceColor(const QColor color) {tColor = color;};
     void setColor(const QColor color) {this->color = color;};
     void setWeaponLen(qreal len) {weapon->setLen(len);};
+    void setPowerType(PowerType type) {pwr = type;};
     void accelerate(qreal accel);
     void acceleratePercent(qreal percent);
     void takeDamage(int dmg) {hp -= dmg;};
@@ -46,7 +51,7 @@ public:
 
     bool detectCellWeaponCollision(const QRectF& cell) const;
     bool resolveCellCollision(const QRectF& cell);
-    bool bounceOff(Ball& other);
+    bool bounceOffBall(Ball& other);
     bool bounceOffWeapon(Ball& other);
     bool resolveUpgradeCollision(Upgrade& other);
     CollisionResult resolveFieldCollision(const QRectF& field);
@@ -62,6 +67,8 @@ private:
     int hp = 100;
     QColor tColor = Qt::red;
     QColor color = Qt::white;
+
+    PowerType pwr;
 };
 
 #endif // BALL_H

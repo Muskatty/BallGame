@@ -19,6 +19,7 @@ qt_add_executable(BallGame
     holypower.h holypower.cpp
     debugwidget.h debugwidget.cpp
     waterpower.h waterpower.cpp
+    powerfactory.h powerfactory.cpp
 )
 
 target_link_libraries(BallGame

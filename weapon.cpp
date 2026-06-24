@@ -12,6 +12,8 @@ void Weapon::move(const qreal dt) {
     angl += vel * dt;
     if (angl > 360.0) {
         angl -= 360.0;
+    } else if (angl < 0.0) {
+        angl += 360.0;
     }
 }
 

@@ -1,4 +1,5 @@
 #include "ballgrid.h"
+#include "powerfactory.h"
 
 BallGridWidget::BallGridWidget(QWidget* parent) : QWidget(parent)
 {
@@ -28,17 +29,17 @@ BallGridWidget::BallGridWidget(QWidget* parent) : QWidget(parent)
         }
     }
 
-    balls.push_back(Ball(QPointF(100.0, 100.0), QPointF(140.0, 140.0), 20.0));
-    balls.push_back(Ball(QPointF(100.0, 500.0), QPointF(140.0, 140.0), 20.0));
-    balls.push_back(Ball(QPointF(500.0, 100.0), QPointF(140.0, 140.0), 20.0));
-    balls.push_back(Ball(QPointF(500.0, 500.0), QPointF(140.0, 140.0), 20.0));
+    balls.push_back(Ball(QPointF(100.0, 100.0), QPointF(140.0, 140.0), 20.0, PowerType::Holy));
+    balls.push_back(Ball(QPointF(100.0, 500.0), QPointF(140.0, 140.0), 20.0, PowerType::Water));
+    balls.push_back(Ball(QPointF(500.0, 100.0), QPointF(140.0, 140.0), 20.0, PowerType::Holy));
+    balls.push_back(Ball(QPointF(500.0, 500.0), QPointF(140.0, 140.0), 20.0, PowerType::Water));
     balls[1].setTraceColor(Qt::green);
     balls[2].setTraceColor(Qt::yellow);
     balls[3].setTraceColor(Qt::blue);
     field = QRectF(0.0, 0.0, windowWidth, windowHeight);
 
 #ifdef QT_DEBUG
-    debugWindow = new DebugWidget(this);
+    debugWindow = new DebugWidget(this, parent);
     debugWindow->show();
 #endif
 
@@ -96,7 +97,7 @@ void BallGridWidget::updateBalls(qreal dt) {
 
         //check collision with other balls
         for (int j = i + 1; j < balls.size(); j++) {
-            balls[i].bounceOff(balls[j]);
+            balls[i].bounceOffBall(balls[j]);
         }
 
         //check collision with cells of other color
@@ -150,7 +151,7 @@ void BallGridWidget::updateUpgrades() {
             if (ball.resolveUpgradeCollision(upgrades[i])) {
                 //if collided with power upgrade - spawn power
                 if (upgrades[i].type() == UpgradeType::Power) {
-                    powers.push_back(std::make_shared<HolyPower>(ball, powersPotency));
+                    powers.push_back(PowerFactory::createPower(ball.powerType(), ball, powersPotency));
                 }
                 upgrades.erase(upgrades.begin() + i);
                 continue;
@@ -210,7 +211,7 @@ void BallGridWidget::giveUpgrade(int idx, UpgradeType type) {
     }
     balls[idx].applyUpgrade(type);
     if (type == UpgradeType::Power) {
-        powers.push_back(std::make_shared<WaterPower>(balls[idx], powersPotency));
+        powers.push_back(PowerFactory::createPower(balls[idx].powerType(), balls[idx], powersPotency));
     }
 }
 #endif
