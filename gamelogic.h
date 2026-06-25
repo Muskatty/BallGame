@@ -29,6 +29,7 @@ private:
     void updateCells();
 
     void trySpawnUpgrade();
+    void createPower(Ball& ball);
 
 public:
     static constexpr int windowWidth = 800;

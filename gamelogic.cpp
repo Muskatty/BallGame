@@ -35,10 +35,11 @@ void GameLogic::initField() {
     }
 }
 
+//TODO: Make normal ball and maybe field init
 void GameLogic::initBalls() {
     balls.push_back(Ball(QPointF(100.0, 100.0), QPointF(140.0, 140.0), 20.0, PowerType::Holy));
     balls.push_back(Ball(QPointF(100.0, 500.0), QPointF(140.0, 140.0), 20.0, PowerType::Water));
-    balls.push_back(Ball(QPointF(500.0, 100.0), QPointF(140.0, 140.0), 20.0, PowerType::Holy));
+    balls.push_back(Ball(QPointF(500.0, 100.0), QPointF(140.0, 140.0), 20.0, PowerType::Thief));
     balls.push_back(Ball(QPointF(500.0, 500.0), QPointF(140.0, 140.0), 20.0, PowerType::Water));
     balls[1].setTraceColor(Qt::green);
     balls[2].setTraceColor(Qt::yellow);
@@ -150,16 +151,27 @@ void GameLogic::updatePowers(qreal dt) {
     }
 }
 
+void GameLogic::createPower(Ball& ball) {
+    auto power = PowerFactory::createPower(ball.powerType(), ball, powersPotency);
+    if (power) {
+        GameContext ctx{balls, upgrades, powers, cells, powersPotency};
+        power->onSpawn(ctx);
+        powers.push_back(std::move(power));
+    }
+}
+
 void GameLogic::updateUpgrades() {
     for (auto& ball : balls) {
         for (int i = 0; i < upgrades.size();) {
-            //check whether collision occured
             if (ball.resolveUpgradeCollision(upgrades[i])) {
-                //if collided with power upgrade - spawn power
-                if (upgrades[i].type() == UpgradeType::Power) {
-                    powers.push_back(PowerFactory::createPower(ball.powerType(), ball, powersPotency));
-                }
+                const UpgradeType type = upgrades[i].type();
                 upgrades.erase(upgrades.begin() + i);
+
+                //if collided with power upgrade - spawn power
+                if (type == UpgradeType::Power) {
+                    createPower(ball);
+                }
+
                 continue;
             }
             i++;
@@ -202,7 +214,7 @@ void GameLogic::giveUpgrade(int idx, UpgradeType type) {
     }
     balls[idx].applyUpgrade(type);
     if (type == UpgradeType::Power) {
-        powers.push_back(PowerFactory::createPower(balls[idx].powerType(), balls[idx], powersPotency));
+        createPower(balls[idx]);
     }
 }
 #endif

@@ -1,4 +1,5 @@
 #include "holypower.h"
+#include "geometry.h"
 
 void HolyPower::setTouching(const Ball* b, bool value) {
     if (value) {

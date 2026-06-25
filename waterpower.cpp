@@ -2,6 +2,7 @@
 
 #include <QPainter>
 #include <QTransform>
+#include "geometry.h"
 
 namespace {
 
@@ -91,7 +92,7 @@ QPainterPath WaterPower::arcPath() const {
 void WaterPower::draw(QPainter& painter) const {
     painter.save();
     painter.setPen(Qt::NoPen);
-    painter.setBrush(QColor(0, 191, 255));
+    painter.setBrush(powerToColor[PowerType::Water]);
     painter.drawPath(arcPath());
     painter.restore();
 }

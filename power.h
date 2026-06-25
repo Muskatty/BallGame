@@ -4,16 +4,19 @@
 #include <QPolygonF>
 #include <QPainter>
 #include "ball.h"
-#include "geometry.h"
+#include "gamecontext.h"
 
 enum class PowerType {
     Holy,
     Water,
+    Thief,
     Count
 };
 
 static std::unordered_map<PowerType, QColor> powerToColor = {
-    {PowerType::Holy, QColor(255, 251, 201)}
+    {PowerType::Holy, QColor(255, 251, 201)},
+    {PowerType::Water, QColor(0, 191, 255)},
+    {PowerType::Thief, QColor(158, 158, 158)}
 };
 
 class Power
@@ -23,6 +26,8 @@ public:
     virtual ~Power() {};
 
     virtual void draw(QPainter& painter) const = 0;
+
+    virtual void onSpawn(GameContext& ctx) {};
     virtual bool resolveBallCollision(Ball &other) = 0;
     virtual bool resolveFieldCollision(std::vector<std::vector<QColor>>& field, qreal width, qreal height) = 0;
 

@@ -21,6 +21,8 @@ qt_add_executable(BallGame
     waterpower.h waterpower.cpp
     powerfactory.h powerfactory.cpp
     gamelogic.h gamelogic.cpp
+    gamecontext.h
+    thiefpower.h thiefpower.cpp
 )
 
 target_link_libraries(BallGame
