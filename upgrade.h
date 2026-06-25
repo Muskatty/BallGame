@@ -39,7 +39,7 @@ public:
     qreal radius() const {return r;};
     UpgradeType type() const {return t;};
 
-    void draw(QPainter& painter);
+    void draw(QPainter& painter) const;
 
 private:
     QPointF position;

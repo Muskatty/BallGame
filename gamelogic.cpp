@@ -3,31 +3,39 @@
 #include <QRandomGenerator>
 
 GameLogic::GameLogic() {
+    initBalls();
+    initField();
+}
+
+void GameLogic::initField() {
     cells.resize(rows, std::vector<QColor>(cols, QColor(60, 60, 60)));
+    field = QRectF(0.0, 0.0, windowWidth, windowHeight);
 
     for (int i = 0; i < rows / 2; i++) {
         for (int j = 0; j < cols / 2; j++) {
-            cells[i][j] = Qt::red;
+            cells[i][j] = balls[0].traceColor();
         }
     }
     for (int i = rows / 2 + 1; i < rows; i++) {
         for (int j = 0; j < cols / 2; j++) {
-            cells[i][j] = Qt::green;
+            cells[i][j] = balls[1].traceColor();
         }
     }
 
     for (int i = 0; i < rows / 2; i++) {
         for (int j = cols / 2 + 1; j < cols; j++) {
-            cells[i][j] = Qt::yellow;
+            cells[i][j] = balls[2].traceColor();
         }
     }
 
     for (int i = rows / 2 + 1; i < rows; i++) {
         for (int j = cols / 2 + 1; j < cols; j++) {
-            cells[i][j] = Qt::blue;
+            cells[i][j] = balls[3].traceColor();
         }
     }
+}
 
+void GameLogic::initBalls() {
     balls.push_back(Ball(QPointF(100.0, 100.0), QPointF(140.0, 140.0), 20.0, PowerType::Holy));
     balls.push_back(Ball(QPointF(100.0, 500.0), QPointF(140.0, 140.0), 20.0, PowerType::Water));
     balls.push_back(Ball(QPointF(500.0, 100.0), QPointF(140.0, 140.0), 20.0, PowerType::Holy));
@@ -35,10 +43,9 @@ GameLogic::GameLogic() {
     balls[1].setTraceColor(Qt::green);
     balls[2].setTraceColor(Qt::yellow);
     balls[3].setTraceColor(Qt::blue);
-    field = QRectF(0.0, 0.0, windowWidth, windowHeight);
 }
 
-void GameLogic::draw(QPainter& painter) {
+void GameLogic::draw(QPainter& painter) const {
     painter.fillRect(field, QColor(30, 30, 30));
 
     for (int y = 0; y < rows; ++y) {

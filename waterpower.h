@@ -27,7 +27,7 @@ public:
 
     void setTouching(const Ball* b, bool value);
 
-    void draw(QPainter& painter) override;
+    void draw(QPainter& painter) const override;
     bool resolveBallCollision(Ball& other) override;
     bool resolveFieldCollision(std::vector<std::vector<QColor>>& field, qreal width, qreal height) override;
     void decreaseLife(qreal dt) override;

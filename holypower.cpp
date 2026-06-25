@@ -8,7 +8,7 @@ void HolyPower::setTouching(const Ball* b, bool value) {
     }
 }
 
-void HolyPower::draw(QPainter& painter) {
+void HolyPower::draw(QPainter& painter) const {
     painter.setBrush(powerToColor[PowerType::Holy]);
     painter.setPen(Qt::NoPen);
     painter.drawEllipse(position, radius(), radius());

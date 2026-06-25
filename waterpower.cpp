@@ -88,7 +88,7 @@ QPainterPath WaterPower::arcPath() const {
     return path;
 }
 
-void WaterPower::draw(QPainter& painter) {
+void WaterPower::draw(QPainter& painter) const {
     painter.save();
     painter.setPen(Qt::NoPen);
     painter.setBrush(QColor(0, 191, 255));

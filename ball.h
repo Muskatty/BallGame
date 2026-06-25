@@ -56,7 +56,7 @@ public:
     bool resolveUpgradeCollision(Upgrade& other);
     CollisionResult resolveFieldCollision(const QRectF& field);
 
-    void draw(QPainter& p);
+    void draw(QPainter& p) const;
     void move(const qreal dt);
 
 private:

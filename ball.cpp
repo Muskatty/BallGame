@@ -218,7 +218,7 @@ void Ball::acceleratePercent(qreal percent) {
     vel.setY(vel.y() * (1 + percent));
 }
 
-void Ball::draw(QPainter& painter)
+void Ball::draw(QPainter& painter) const
 {
     weapon->draw(painter);
 

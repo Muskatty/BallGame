@@ -17,7 +17,7 @@ void Weapon::move(const qreal dt) {
     }
 }
 
-void Weapon::draw(QPainter& painter) {
+void Weapon::draw(QPainter& painter) const {
     qreal centerX = targetPos.x();
     qreal centerY = targetPos.y();
 

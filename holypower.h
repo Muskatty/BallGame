@@ -13,15 +13,15 @@ public:
         lifet = maxlife;
     };
 
-    qreal radius() {return rad * potency * (1 - (lifet / maxlife));};
+    qreal radius() const {return rad * potency * (1 - (lifet / maxlife));};
 
-    bool isTouching(const Ball* b) {
+    bool isTouching(const Ball* b) const {
         return touchedBalls.contains(b);
     }
 
     void setTouching(const Ball* b, bool value);
 
-    void draw(QPainter& painter) override;
+    void draw(QPainter& painter) const override;
     bool resolveBallCollision(Ball& other) override;
     bool resolveFieldCollision(std::vector<std::vector<QColor>>& field, qreal width, qreal height) override;
 private:

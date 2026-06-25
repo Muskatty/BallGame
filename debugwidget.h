@@ -3,17 +3,17 @@
 
 #include <QWidget>
 
-class BallGridWidget;
+class GameLogic;
 
 #ifdef QT_DEBUG
 class DebugWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit DebugWidget(BallGridWidget* grid, QWidget *parent = nullptr);
+    explicit DebugWidget(GameLogic* grid, QWidget *parent = nullptr);
 
 private:
-    BallGridWidget* grid;
+    GameLogic* grid;
 };
 #endif // QT_DEBUG
 

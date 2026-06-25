@@ -13,7 +13,7 @@ Upgrade::Upgrade(QPointF fieldSize) {
     t = static_cast<UpgradeType>(ty);
 }
 
-void Upgrade::draw(QPainter& painter)
+void Upgrade::draw(QPainter& painter) const
 {
     painter.setBrush(toColor[t]);
     painter.setPen(Qt::black);

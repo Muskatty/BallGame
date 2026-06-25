@@ -5,7 +5,7 @@ BallGridWidget::BallGridWidget(QWidget* parent) : QWidget(parent)
     setFixedSize(GameLogic::windowWidth, GameLogic::windowHeight);
 
 #ifdef QT_DEBUG
-    debugWindow = new DebugWidget(this, parent);
+    debugWindow = new DebugWidget(&engine, parent);
     debugWindow->show();
 #endif
 

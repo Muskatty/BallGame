@@ -3,11 +3,11 @@
 #include <QGroupBox>
 #include <QPushButton>
 
-#include "ballgrid.h"
+#include "gamelogic.h"
 
 #ifdef QT_DEBUG
 
-DebugWidget::DebugWidget(BallGridWidget *grid_, QWidget *parent)
+DebugWidget::DebugWidget(GameLogic *grid_, QWidget *parent)
     : QWidget(parent), grid(grid_)
 {
     auto* layout = new QGridLayout(this);

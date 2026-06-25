@@ -38,7 +38,7 @@ public:
 
     void updatePos(const QPointF& pos);
     void move(const qreal dt);
-    void draw(QPainter& painter);
+    void draw(QPainter& painter) const;
     bool detectCellCollision(const QRectF& cellRect) const;
     bool bounceOffWeapon(Weapon& other);
 private:

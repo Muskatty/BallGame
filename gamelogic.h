@@ -9,7 +9,7 @@ class GameLogic
 public:
     GameLogic();
 
-    void draw(QPainter& painter);
+    void draw(QPainter& painter) const;
     void update(qreal dt);
 
 #ifdef QT_DEBUG
@@ -20,6 +20,9 @@ public:
 #endif
 
 private:
+    void initField();
+    void initBalls();
+
     void updateBalls(qreal dt);
     void updatePowers(qreal dt);
     void updateUpgrades();
