@@ -20,6 +20,7 @@ qt_add_executable(BallGame
     debugwidget.h debugwidget.cpp
     waterpower.h waterpower.cpp
     powerfactory.h powerfactory.cpp
+    gamelogic.h gamelogic.cpp
 )
 
 target_link_libraries(BallGame

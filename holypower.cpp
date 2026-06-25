@@ -57,7 +57,7 @@ bool HolyPower::resolveFieldCollision(std::vector<std::vector<QColor>>& field, q
             QRectF cell(x * cellSize, y * cellSize, cellSize, cellSize);
             Collision::CollisionInfo coll = Collision::circleRect(position, radius(), cell, transform);
             if (coll.hit) {
-                field[y][x] = parent.traceColor();//powerToColor[PowerType::Holy];
+                field[y][x] = parent.traceColor();
             }
         }
     }
