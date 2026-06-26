@@ -26,13 +26,13 @@ qreal signedAngleDiffDeg(qreal a, qreal b)
 } // namespace
 
 
-WaterPower::WaterPower(Ball& p, qreal pot)
+WaterPower::WaterPower(Ball* p, qreal pot)
     : Power(p, pot), rad(48.0), thick(18.0), halfAng(60.0)
 {
     maxlife = waterMaxLife;
     lifet = maxlife;
 
-    const QPointF v = parent.velocity();
+    const QPointF v = parent->velocity();
     const qreal len = Geometry::length(v);
 
     if (len < EPS) {
@@ -98,7 +98,7 @@ void WaterPower::draw(QPainter& painter) const {
 }
 
 bool WaterPower::resolveBallCollision(Ball& other) {
-    if (&parent == &other) {
+    if (parent == &other) {
         return false;
     }
 
@@ -110,7 +110,7 @@ bool WaterPower::resolveBallCollision(Ball& other) {
     const bool firstTouch = !isTouching(&other);
 
     if (firstTouch) {
-        other.takeDamage(parent.weaponDmg());
+        other.takeDamage(parent->weaponDmg());
     }
 
     setTouching(&other, true);
@@ -138,7 +138,7 @@ bool WaterPower::resolveFieldCollision(std::vector<std::vector<QColor>>& field, 
                 );
 
             if (containsPoint(cellCenter)) {
-                field[y][x] = parent.traceColor();
+                field[y][x] = parent->traceColor();
             }
         }
     }

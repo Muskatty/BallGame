@@ -9,7 +9,7 @@ class Upgrade;
 class Power;
 
 struct GameContext {
-    std::vector<Ball>& balls;
+    std::vector<std::unique_ptr<Ball>>& balls;
     std::vector<Upgrade>& upgrades;
     std::vector<std::unique_ptr<Power>>& powers;
     std::vector<std::vector<QColor>>& cells;

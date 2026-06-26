@@ -23,7 +23,7 @@ public:
         r(radius_),
         pwr(type)
     {
-        weapon = std::make_shared<Weapon>(cntr, 270.0, 16.0, 60.0);
+        weapon = std::make_unique<Weapon>(cntr, 270.0, 16.0, 60.0);
     };
 
     QPointF center() const {return cntr;};
@@ -60,7 +60,7 @@ public:
     void move(const qreal dt);
 
 private:
-    std::shared_ptr<Weapon> weapon;
+    std::unique_ptr<Weapon> weapon;
     QPointF cntr;
     QPointF vel;
     qreal r;

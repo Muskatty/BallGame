@@ -2,8 +2,9 @@
 #include "holypower.h"
 #include "waterpower.h"
 #include "thiefpower.h"
+#include "earthpower.h"
 
-std::unique_ptr<Power> PowerFactory::createPower(PowerType type, Ball& b, qreal potency) {
+std::unique_ptr<Power> PowerFactory::createPower(PowerType type, Ball* b, qreal potency) {
     switch (type) {
     case PowerType::Holy:
         return std::make_unique<HolyPower>(b, potency);
@@ -11,6 +12,8 @@ std::unique_ptr<Power> PowerFactory::createPower(PowerType type, Ball& b, qreal 
         return std::make_unique<WaterPower>(b, potency);
     case PowerType::Thief:
         return std::make_unique<ThiefPower>(b, potency);
+    case PowerType::Earth:
+        return std::make_unique<EarthPower>(b, potency);
     }
 
     return nullptr;

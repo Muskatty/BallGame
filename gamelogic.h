@@ -29,7 +29,7 @@ private:
     void updateCells();
 
     void trySpawnUpgrade();
-    void createPower(Ball& ball);
+    void createPower(Ball* ball);
 
 public:
     static constexpr int windowWidth = 800;
@@ -42,7 +42,7 @@ private:
     static constexpr double ballRadius = 12.0;
     static constexpr double weaponLen = 60.0;
 
-    std::vector<Ball> balls;
+    std::vector<std::unique_ptr<Ball>> balls;
     std::vector<Upgrade> upgrades;
     std::vector<std::unique_ptr<Power>> powers;
     QRectF field;

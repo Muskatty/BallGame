@@ -1,13 +1,13 @@
 #include "thiefpower.h"
 #include "geometry.h"
 
-ThiefPower::ThiefPower(Ball& p, qreal pot) : Power(p, pot) {
+ThiefPower::ThiefPower(Ball* p, qreal pot) : Power(p, pot) {
     maxlife = thiefMaxLife;
     lifet = maxlife;
 }
 
 void ThiefPower::draw(QPainter& painter) const {
-    QPointF center = parent.center();
+    QPointF center = parent->center();
 
     painter.save();
     painter.setPen(powerToColor[PowerType::Thief]);
@@ -37,13 +37,13 @@ void ThiefPower::absorbUpgrades(std::vector<Upgrade>& upgrades) {
 }
 
 void ThiefPower::applyUpgradeToParent(const Upgrade& up) {
-    parent.applyUpgrade(up.type());
+    parent->applyUpgrade(up.type());
 }
 
 void ThiefPower::update(qreal dt) {
-    const QPointF target = parent.center();
+    const QPointF target = parent->center();
     const qreal pullSpeed = 650.0;
-    const qreal snapDist = parent.radius();
+    const qreal snapDist = parent->radius();
 
     for (int i = 0; i < stolen.size();) {
         Upgrade &up = stolen[i];

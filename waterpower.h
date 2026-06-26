@@ -12,7 +12,7 @@ static constexpr qreal waterVelModifier = 0.25;
 class WaterPower : public Power
 {
 public:
-    WaterPower(Ball& p, qreal pot);
+    WaterPower(Ball* p, qreal pot);
 
     qreal radius() const { return rad * potency * (1.0 - lifet / maxlife); }
     qreal innerRadius() const { return std::max(0.0, radius() - thick * 0.5); }

@@ -6,7 +6,7 @@
 class PowerFactory
 {
 public:
-    static std::unique_ptr<Power> createPower(PowerType type, Ball& b, qreal potency);
+    static std::unique_ptr<Power> createPower(PowerType type, Ball* b, qreal potency);
 };
 
 #endif // POWERFACTORY_H

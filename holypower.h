@@ -8,7 +8,7 @@ static constexpr qreal holyMaxLife = 0.33;
 class HolyPower : public Power
 {
 public:
-    HolyPower(Ball& p, qreal pot) : Power(p, pot), rad(30.0) {
+    HolyPower(Ball* p, qreal pot) : Power(p, pot), rad(30.0) {
         maxlife = holyMaxLife;
         lifet = maxlife;
     };

@@ -16,7 +16,7 @@ void HolyPower::draw(QPainter& painter) const {
 }
 
 bool HolyPower::resolveBallCollision(Ball& other) {
-    if (&parent == &other) {
+    if (parent == &other) {
         return false;
     }
 
@@ -30,7 +30,7 @@ bool HolyPower::resolveBallCollision(Ball& other) {
     bool firstHit = !isTouching(&other);
 
     if (firstHit) {
-        other.takeDamage(parent.weaponDmg());
+        other.takeDamage(parent->weaponDmg());
         setTouching(&other, true);
     }
 
@@ -58,7 +58,7 @@ bool HolyPower::resolveFieldCollision(std::vector<std::vector<QColor>>& field, q
             QRectF cell(x * cellSize, y * cellSize, cellSize, cellSize);
             Collision::CollisionInfo coll = Collision::circleRect(position, radius(), cell, transform);
             if (coll.hit) {
-                field[y][x] = parent.traceColor();
+                field[y][x] = parent->traceColor();
             }
         }
     }

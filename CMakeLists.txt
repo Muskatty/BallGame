@@ -23,6 +23,7 @@ qt_add_executable(BallGame
     gamelogic.h gamelogic.cpp
     gamecontext.h
     thiefpower.h thiefpower.cpp
+    earthpower.h earthpower.cpp
 )
 
 target_link_libraries(BallGame

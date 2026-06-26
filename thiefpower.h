@@ -8,7 +8,7 @@ static constexpr qreal thiefMaxLife = 6.33;
 class ThiefPower : public Power
 {
 public:
-    ThiefPower(Ball& p, qreal pot);
+    ThiefPower(Ball* p, qreal pot);
 
     void draw(QPainter& painter) const override;
 

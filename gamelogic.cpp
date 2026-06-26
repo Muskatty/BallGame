@@ -13,37 +13,37 @@ void GameLogic::initField() {
 
     for (int i = 0; i < rows / 2; i++) {
         for (int j = 0; j < cols / 2; j++) {
-            cells[i][j] = balls[0].traceColor();
+            cells[i][j] = balls[0]->traceColor();
         }
     }
     for (int i = rows / 2 + 1; i < rows; i++) {
         for (int j = 0; j < cols / 2; j++) {
-            cells[i][j] = balls[1].traceColor();
+            cells[i][j] = balls[1]->traceColor();
         }
     }
 
     for (int i = 0; i < rows / 2; i++) {
         for (int j = cols / 2 + 1; j < cols; j++) {
-            cells[i][j] = balls[2].traceColor();
+            cells[i][j] = balls[2]->traceColor();
         }
     }
 
     for (int i = rows / 2 + 1; i < rows; i++) {
         for (int j = cols / 2 + 1; j < cols; j++) {
-            cells[i][j] = balls[3].traceColor();
+            cells[i][j] = balls[3]->traceColor();
         }
     }
 }
 
 //TODO: Make normal ball and maybe field init
 void GameLogic::initBalls() {
-    balls.push_back(Ball(QPointF(100.0, 100.0), QPointF(140.0, 140.0), 20.0, PowerType::Holy));
-    balls.push_back(Ball(QPointF(100.0, 500.0), QPointF(140.0, 140.0), 20.0, PowerType::Water));
-    balls.push_back(Ball(QPointF(500.0, 100.0), QPointF(140.0, 140.0), 20.0, PowerType::Thief));
-    balls.push_back(Ball(QPointF(500.0, 500.0), QPointF(140.0, 140.0), 20.0, PowerType::Water));
-    balls[1].setTraceColor(Qt::green);
-    balls[2].setTraceColor(Qt::yellow);
-    balls[3].setTraceColor(Qt::blue);
+    balls.push_back(std::make_unique<Ball>(QPointF(100.0, 100.0), QPointF(140.0, 140.0), 20.0, PowerType::Holy));
+    balls.push_back(std::make_unique<Ball>(QPointF(100.0, 500.0), QPointF(140.0, 140.0), 20.0, PowerType::Water));
+    balls.push_back(std::make_unique<Ball>(QPointF(500.0, 100.0), QPointF(140.0, 140.0), 20.0, PowerType::Thief));
+    balls.push_back(std::make_unique<Ball>(QPointF(500.0, 500.0), QPointF(140.0, 140.0), 20.0, PowerType::Earth));
+    balls[1]->setTraceColor(Qt::green);
+    balls[2]->setTraceColor(Qt::yellow);
+    balls[3]->setTraceColor(Qt::blue);
 }
 
 void GameLogic::draw(QPainter& painter) const {
@@ -66,7 +66,7 @@ void GameLogic::draw(QPainter& painter) const {
     }
 
     for (auto& ball : balls) {
-        ball.draw(painter);
+        ball->draw(painter);
     }
 }
 
@@ -84,34 +84,34 @@ void GameLogic::update(qreal dt) {
 void GameLogic::updateBalls(qreal dt) {
     for (int i = 0; i < balls.size();) {
         //check whether ball is dead and delete it
-        if (balls[i].health() <= 0) {
+        if (balls[i]->health() <= 0) {
             balls.erase(balls.begin() + i);
             continue;
         }
 
         //move and check if collides with field border
-        balls[i].move(dt);
-        balls[i].resolveFieldCollision(field);
+        balls[i]->move(dt);
+        balls[i]->resolveFieldCollision(field);
 
         //check collision with weapons
         for (int j = 0; j < balls.size(); j++) {
             if (i == j) {
                 continue;
             }
-            balls[i].bounceOffWeapon(balls[j]);
-            balls[i].getWeapon()->bounceOffWeapon(*balls[j].getWeapon());
+            balls[i]->bounceOffWeapon(*balls[j]);
+            balls[i]->getWeapon()->bounceOffWeapon(*balls[j]->getWeapon());
         }
 
         //check collision with other balls
         for (int j = i + 1; j < balls.size(); j++) {
-            balls[i].bounceOffBall(balls[j]);
+            balls[i]->bounceOffBall(*balls[j]);
         }
 
         //check collision with cells of other color
-        int centerCol = static_cast<int>(balls[i].x()) / cellSize;
-        int centerRow = static_cast<int>(balls[i].y()) / cellSize;
+        int centerCol = static_cast<int>(balls[i]->x()) / cellSize;
+        int centerRow = static_cast<int>(balls[i]->y()) / cellSize;
 
-        int bCFS = balls[i].radius() / cellSize + 1;
+        int bCFS = balls[i]->radius() / cellSize + 1;
         int upperBBound = std::max(0, centerRow - bCFS);
         int lowerBBound = std::min(rows - 1, centerRow + bCFS);
         int leftBBound = std::max(0, centerCol - bCFS);
@@ -121,8 +121,8 @@ void GameLogic::updateBalls(qreal dt) {
         for (int x = leftBBound; x <= rightBBound && !collided; x++) {
             for (int y = upperBBound; y <= lowerBBound && !collided; y++) {
                 QRectF cell(x * cellSize, y * cellSize, cellSize, cellSize);
-                if (balls[i].traceColor() != cells[y][x]) {
-                    if (balls[i].resolveCellCollision(cell)) {
+                if (balls[i]->traceColor() != cells[y][x]) {
+                    if (balls[i]->resolveCellCollision(cell)) {
                         collided = true;
                     }
                 }
@@ -142,7 +142,7 @@ void GameLogic::updatePowers(qreal dt) {
         powers[i]->decreaseLife(dt);
 
         for (auto& ball : balls) {
-            powers[i]->resolveBallCollision(ball);
+            powers[i]->resolveBallCollision(*ball);
         }
 
         powers[i]->resolveFieldCollision(cells, windowWidth, windowHeight);
@@ -151,8 +151,12 @@ void GameLogic::updatePowers(qreal dt) {
     }
 }
 
-void GameLogic::createPower(Ball& ball) {
-    auto power = PowerFactory::createPower(ball.powerType(), ball, powersPotency);
+void GameLogic::createPower(Ball* ball) {
+    if (!ball) {
+        return;
+    }
+
+    auto power = PowerFactory::createPower(ball->powerType(), ball, powersPotency);
     if (power) {
         GameContext ctx{balls, upgrades, powers, cells, powersPotency};
         power->onSpawn(ctx);
@@ -163,13 +167,13 @@ void GameLogic::createPower(Ball& ball) {
 void GameLogic::updateUpgrades() {
     for (auto& ball : balls) {
         for (int i = 0; i < upgrades.size();) {
-            if (ball.resolveUpgradeCollision(upgrades[i])) {
+            if (ball->resolveUpgradeCollision(upgrades[i])) {
                 const UpgradeType type = upgrades[i].type();
                 upgrades.erase(upgrades.begin() + i);
 
                 //if collided with power upgrade - spawn power
                 if (type == UpgradeType::Power) {
-                    createPower(ball);
+                    createPower(ball.get());
                 }
 
                 continue;
@@ -181,10 +185,10 @@ void GameLogic::updateUpgrades() {
 
 void GameLogic::updateCells() {
     for (auto& ball : balls) {
-        int centerCol = static_cast<int>(ball.x()) / cellSize;
-        int centerRow = static_cast<int>(ball.y()) / cellSize;
+        int centerCol = static_cast<int>(ball->x()) / cellSize;
+        int centerRow = static_cast<int>(ball->y()) / cellSize;
 
-        int wCFS = ball.weaponLen() / cellSize + 1;
+        int wCFS = ball->weaponLen() / cellSize + 1;
         int upperWBound = std::max(0, centerRow - wCFS);
         int lowerWBound = std::min(rows - 1, centerRow + wCFS);
         int leftWBound = std::max(0, centerCol - wCFS);
@@ -193,8 +197,8 @@ void GameLogic::updateCells() {
         for (int x = leftWBound; x <= rightWBound; x++) {
             for (int y = upperWBound; y <= lowerWBound; y++) {
                 QRectF cell(x * cellSize, y * cellSize, cellSize, cellSize);
-                if (ball.detectCellWeaponCollision(cell)) {
-                    cells[y][x] = ball.traceColor();
+                if (ball->detectCellWeaponCollision(cell)) {
+                    cells[y][x] = ball->traceColor();
                 }
             }
         }
@@ -209,12 +213,12 @@ void GameLogic::trySpawnUpgrade() {
 
 #ifdef QT_DEBUG
 void GameLogic::giveUpgrade(int idx, UpgradeType type) {
-    if (idx >= balls.size()) {
+    if (idx >= balls.size() || idx >= balls.size()) {
         return;
     }
-    balls[idx].applyUpgrade(type);
+    balls[idx]->applyUpgrade(type);
     if (type == UpgradeType::Power) {
-        createPower(balls[idx]);
+        createPower(balls[idx].get());
     }
 }
 #endif
