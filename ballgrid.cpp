@@ -2,10 +2,14 @@
 
 BallGridWidget::BallGridWidget(QWidget* parent) : QWidget(parent)
 {
-    setFixedSize(GameLogic::windowWidth, GameLogic::windowHeight);
+    const GameConfig config = GameConfig::defaultConfig();
+
+    engine = std::make_unique<GameLogic>(config);
+
+    setFixedSize(config.windowWidth, config.windowHeight);
 
 #ifdef QT_DEBUG
-    debugWindow = new DebugWidget(&engine, parent);
+    debugWindow = new DebugWidget(engine.get(), parent);
     debugWindow->show();
 #endif
 
@@ -17,13 +21,13 @@ BallGridWidget::BallGridWidget(QWidget* parent) : QWidget(parent)
 void BallGridWidget::paintEvent(QPaintEvent*)
 {
     QPainter painter(this);
-    engine.draw(painter);
+    engine->draw(painter);
 }
 
 void BallGridWidget::onTick()
 {
     const double dt = 0.016;
-    engine.update(dt);
+    engine->update(dt);
 
     update();
 }

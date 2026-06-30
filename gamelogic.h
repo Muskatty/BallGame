@@ -3,11 +3,14 @@
 
 #include "ball.h"
 #include "power.h"
+#include "gameconfig.h"
 
 class GameLogic
 {
 public:
-    GameLogic();
+    GameLogic(const GameConfig& cfg);
+
+    void applyConfig(const GameConfig& cfg);
 
     void draw(QPainter& painter) const;
     void update(qreal dt);
@@ -23,6 +26,8 @@ private:
     void initField();
     void initBalls();
 
+    void restart();
+
     void updateBalls(qreal dt);
     void updatePowers(qreal dt);
     void updateUpgrades();
@@ -31,16 +36,13 @@ private:
     void trySpawnUpgrade();
     void createPower(Ball* ball);
 
-public:
-    static constexpr int windowWidth = 800;
-    static constexpr int windowHeight = 600;
-
 private:
-    static constexpr int cellSize = 20;
-    static constexpr int cols = windowWidth / cellSize;
-    static constexpr int rows = windowHeight / cellSize;
-    static constexpr double ballRadius = 12.0;
-    static constexpr double weaponLen = 60.0;
+    GameConfig config;
+
+    int cols;// = windowWidth / cellSize;
+    int rows;// = windowHeight / cellSize;
+    //static constexpr double ballRadius = 12.0;
+    //static constexpr double weaponLen = 60.0;
 
     std::vector<std::unique_ptr<Ball>> balls;
     std::vector<Upgrade> upgrades;

@@ -26,7 +26,7 @@ private:
     void onTick();
 
 private:
-    GameLogic engine;
+    std::unique_ptr<GameLogic> engine;
 
     QTimer timer;
 };

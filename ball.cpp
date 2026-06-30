@@ -4,6 +4,17 @@
 #include <cmath>
 #include <algorithm>
 
+Ball::Ball(const BallConfig& cfg) :
+    cntr(cfg.initialPosition),
+    r(cfg.radius),
+    vel(cfg.initialVelocity),
+    hp(cfg.hp),
+    pwr(cfg.type),
+    tColor(powerToColor.at(cfg.type))
+{
+    weapon = std::make_unique<Weapon>(cfg.weapon);
+}
+
 bool Ball::detectCellWeaponCollision(const QRectF& cell) const
 {
     return weapon->detectCellCollision(cell);

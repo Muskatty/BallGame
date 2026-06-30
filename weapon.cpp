@@ -3,6 +3,16 @@
 #include <QPainterPath>
 #include <qdebug.h>
 
+Weapon::Weapon(const WeaponConfig& cfg) :
+    targetPos(cfg.initialPosition),
+    vel(cfg.velocity),
+    w(cfg.width),
+    l(cfg.length),
+    dmg(cfg.damage)
+{
+
+}
+
 void Weapon::updatePos(const QPointF& pos) {
     targetPos = pos;
 }

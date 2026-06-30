@@ -6,13 +6,13 @@
 #include <QPointF>
 #include <QRectF>
 #include <QPainter>
+#include "powercolors.h"
+#include "gameconfig.h"
 
 struct CollisionResult {
     bool hitX = false;
     bool hitY = false;
 };
-
-enum class PowerType;
 
 class Ball
 {
@@ -21,10 +21,12 @@ public:
         cntr(center_),
         vel(velocity_),
         r(radius_),
-        pwr(type)
+        pwr(type),
+        tColor(powerToColor.at(type))
     {
         weapon = std::make_unique<Weapon>(cntr, 270.0, 16.0, 60.0);
     };
+    Ball(const BallConfig& cfg);
 
     QPointF center() const {return cntr;};
     QPointF velocity() const {return vel;};

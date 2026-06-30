@@ -2,14 +2,22 @@
 #include "powerfactory.h"
 #include <QRandomGenerator>
 
-GameLogic::GameLogic() {
+GameLogic::GameLogic(const GameConfig& cfg) {
+    config = cfg;
+    rows = config.windowHeight / config.cellSize;
+    cols = config.windowWidth / config.cellSize;
     initBalls();
     initField();
 }
 
+void GameLogic::applyConfig(const GameConfig& cfg) {
+    config = cfg;
+    restart();
+}
+
 void GameLogic::initField() {
     cells.resize(rows, std::vector<QColor>(cols, QColor(60, 60, 60)));
-    field = QRectF(0.0, 0.0, windowWidth, windowHeight);
+    field = QRectF(0.0, 0.0, config.windowWidth, config.windowHeight);
 
     for (int i = 0; i < rows / 2; i++) {
         for (int j = 0; j < cols / 2; j++) {
@@ -37,13 +45,27 @@ void GameLogic::initField() {
 
 //TODO: Make normal ball and maybe field init
 void GameLogic::initBalls() {
-    balls.push_back(std::make_unique<Ball>(QPointF(100.0, 100.0), QPointF(140.0, 140.0), 20.0, PowerType::Holy));
-    balls.push_back(std::make_unique<Ball>(QPointF(100.0, 500.0), QPointF(140.0, 140.0), 20.0, PowerType::Water));
-    balls.push_back(std::make_unique<Ball>(QPointF(500.0, 100.0), QPointF(140.0, 140.0), 20.0, PowerType::Thief));
-    balls.push_back(std::make_unique<Ball>(QPointF(500.0, 500.0), QPointF(140.0, 140.0), 20.0, PowerType::Earth));
-    balls[1]->setTraceColor(Qt::green);
-    balls[2]->setTraceColor(Qt::yellow);
-    balls[3]->setTraceColor(Qt::blue);
+    for (const auto& ballConf : config.ballConfigs) {
+        balls.push_back(std::make_unique<Ball>(ballConf));
+    }
+    // balls.push_back(std::make_unique<Ball>(QPointF(100.0, 100.0), QPointF(140.0, 140.0), 20.0, PowerType::Holy));
+    // balls.push_back(std::make_unique<Ball>(QPointF(100.0, 500.0), QPointF(140.0, 140.0), 20.0, PowerType::Water));
+    // balls.push_back(std::make_unique<Ball>(QPointF(500.0, 100.0), QPointF(140.0, 140.0), 20.0, PowerType::Thief));
+    // balls.push_back(std::make_unique<Ball>(QPointF(500.0, 500.0), QPointF(140.0, 140.0), 20.0, PowerType::Earth));
+    //balls[1]->setTraceColor(Qt::green);
+    //balls[2]->setTraceColor(Qt::yellow);
+    //balls[3]->setTraceColor(Qt::blue);
+}
+
+void GameLogic::restart() {
+    balls.clear();
+    powers.clear();
+    upgrades.clear();
+
+    rows = config.windowHeight / config.cellSize;
+    cols = config.windowWidth / config.cellSize;
+    initBalls();
+    initField();
 }
 
 void GameLogic::draw(QPainter& painter) const {
@@ -51,7 +73,7 @@ void GameLogic::draw(QPainter& painter) const {
 
     for (int y = 0; y < rows; ++y) {
         for (int x = 0; x < cols; ++x) {
-            QRect cellRect(x * cellSize, y * cellSize, cellSize - 1, cellSize - 1);
+            QRect cellRect(x * config.cellSize, y * config.cellSize, config.cellSize - 1, config.cellSize - 1);
 
             painter.fillRect(cellRect, cells[y][x]);
         }
@@ -108,10 +130,10 @@ void GameLogic::updateBalls(qreal dt) {
         }
 
         //check collision with cells of other color
-        int centerCol = static_cast<int>(balls[i]->x()) / cellSize;
-        int centerRow = static_cast<int>(balls[i]->y()) / cellSize;
+        int centerCol = static_cast<int>(balls[i]->x()) / config.cellSize;
+        int centerRow = static_cast<int>(balls[i]->y()) / config.cellSize;
 
-        int bCFS = balls[i]->radius() / cellSize + 1;
+        int bCFS = balls[i]->radius() / config.cellSize + 1;
         int upperBBound = std::max(0, centerRow - bCFS);
         int lowerBBound = std::min(rows - 1, centerRow + bCFS);
         int leftBBound = std::max(0, centerCol - bCFS);
@@ -120,7 +142,7 @@ void GameLogic::updateBalls(qreal dt) {
         bool collided = false;
         for (int x = leftBBound; x <= rightBBound && !collided; x++) {
             for (int y = upperBBound; y <= lowerBBound && !collided; y++) {
-                QRectF cell(x * cellSize, y * cellSize, cellSize, cellSize);
+                QRectF cell(x * config.cellSize, y * config.cellSize, config.cellSize, config.cellSize);
                 if (balls[i]->traceColor() != cells[y][x]) {
                     if (balls[i]->resolveCellCollision(cell)) {
                         collided = true;
@@ -145,7 +167,7 @@ void GameLogic::updatePowers(qreal dt) {
             powers[i]->resolveBallCollision(*ball);
         }
 
-        powers[i]->resolveFieldCollision(cells, windowWidth, windowHeight);
+        powers[i]->resolveFieldCollision(cells, config.windowWidth, config.windowHeight);
 
         i++;
     }
@@ -185,10 +207,10 @@ void GameLogic::updateUpgrades() {
 
 void GameLogic::updateCells() {
     for (auto& ball : balls) {
-        int centerCol = static_cast<int>(ball->x()) / cellSize;
-        int centerRow = static_cast<int>(ball->y()) / cellSize;
+        int centerCol = static_cast<int>(ball->x()) / config.cellSize;
+        int centerRow = static_cast<int>(ball->y()) / config.cellSize;
 
-        int wCFS = ball->weaponLen() / cellSize + 1;
+        int wCFS = ball->weaponLen() / config.cellSize + 1;
         int upperWBound = std::max(0, centerRow - wCFS);
         int lowerWBound = std::min(rows - 1, centerRow + wCFS);
         int leftWBound = std::max(0, centerCol - wCFS);
@@ -196,7 +218,7 @@ void GameLogic::updateCells() {
 
         for (int x = leftWBound; x <= rightWBound; x++) {
             for (int y = upperWBound; y <= lowerWBound; y++) {
-                QRectF cell(x * cellSize, y * cellSize, cellSize, cellSize);
+                QRectF cell(x * config.cellSize, y * config.cellSize, config.cellSize, config.cellSize);
                 if (ball->detectCellWeaponCollision(cell)) {
                     cells[y][x] = ball->traceColor();
                 }
@@ -206,8 +228,8 @@ void GameLogic::updateCells() {
 }
 
 void GameLogic::trySpawnUpgrade() {
-    if (QRandomGenerator::global()->bounded(200) == 1 && upgrades.size() < 6) {
-        upgrades.push_back(Upgrade({windowWidth, windowHeight}));
+    if (QRandomGenerator::global()->bounded(200) == 1 && upgrades.size() < config.maxUpgradesCount) {
+        upgrades.push_back(Upgrade({static_cast<qreal>(config.windowWidth), static_cast<qreal>(config.windowHeight)}));
     }
 }
 

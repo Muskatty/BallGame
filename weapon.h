@@ -1,6 +1,7 @@
 #ifndef WEAPON_H
 #define WEAPON_H
 
+#include "gameconfig.h"
 #include <qtypes.h>
 #include <QPainter>
 #include <QSet>
@@ -12,6 +13,7 @@ class Weapon
 public:
     Weapon() : targetPos(0.0, 0.0) {};
     Weapon(QPointF pos, qreal v, qreal wid, qreal len) : targetPos(pos), vel(v), w(wid), l(len) {};
+    Weapon(const WeaponConfig& cfg);
 
     QPointF pos() const {return targetPos;};
     qreal length() const {return l;};
