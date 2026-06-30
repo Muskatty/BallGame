@@ -13,6 +13,7 @@ Ball::Ball(const BallConfig& cfg) :
     tColor(powerToColor.at(cfg.type))
 {
     weapon = std::make_unique<Weapon>(cfg.weapon);
+    weapon->setPosition(cntr);
 }
 
 bool Ball::detectCellWeaponCollision(const QRectF& cell) const

@@ -7,7 +7,6 @@ WeaponConfig makeWeaponConfig(QPointF pos) {
     cfg.length = 60.0;
     cfg.velocity = 270.0;
     cfg.damage = 10;
-    cfg.initialPosition = pos;
     return cfg;
 }
 

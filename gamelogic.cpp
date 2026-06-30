@@ -3,21 +3,21 @@
 #include <QRandomGenerator>
 
 GameLogic::GameLogic(const GameConfig& cfg) {
-    config = cfg;
-    rows = config.windowHeight / config.cellSize;
-    cols = config.windowWidth / config.cellSize;
+    config_ = cfg;
+    rows = config_.windowHeight / config_.cellSize;
+    cols = config_.windowWidth / config_.cellSize;
     initBalls();
     initField();
 }
 
 void GameLogic::applyConfig(const GameConfig& cfg) {
-    config = cfg;
+    config_ = cfg;
     restart();
 }
 
 void GameLogic::initField() {
     cells.resize(rows, std::vector<QColor>(cols, QColor(60, 60, 60)));
-    field = QRectF(0.0, 0.0, config.windowWidth, config.windowHeight);
+    field = QRectF(0.0, 0.0, config_.windowWidth, config_.windowHeight);
 
     for (int i = 0; i < rows / 2; i++) {
         for (int j = 0; j < cols / 2; j++) {
@@ -45,7 +45,7 @@ void GameLogic::initField() {
 
 //TODO: Make normal ball and maybe field init
 void GameLogic::initBalls() {
-    for (const auto& ballConf : config.ballConfigs) {
+    for (const auto& ballConf : config_.ballConfigs) {
         balls.push_back(std::make_unique<Ball>(ballConf));
     }
     // balls.push_back(std::make_unique<Ball>(QPointF(100.0, 100.0), QPointF(140.0, 140.0), 20.0, PowerType::Holy));
@@ -62,8 +62,8 @@ void GameLogic::restart() {
     powers.clear();
     upgrades.clear();
 
-    rows = config.windowHeight / config.cellSize;
-    cols = config.windowWidth / config.cellSize;
+    rows = config_.windowHeight / config_.cellSize;
+    cols = config_.windowWidth / config_.cellSize;
     initBalls();
     initField();
 }
@@ -73,7 +73,7 @@ void GameLogic::draw(QPainter& painter) const {
 
     for (int y = 0; y < rows; ++y) {
         for (int x = 0; x < cols; ++x) {
-            QRect cellRect(x * config.cellSize, y * config.cellSize, config.cellSize - 1, config.cellSize - 1);
+            QRect cellRect(x * config_.cellSize, y * config_.cellSize, config_.cellSize - 1, config_.cellSize - 1);
 
             painter.fillRect(cellRect, cells[y][x]);
         }
@@ -130,10 +130,10 @@ void GameLogic::updateBalls(qreal dt) {
         }
 
         //check collision with cells of other color
-        int centerCol = static_cast<int>(balls[i]->x()) / config.cellSize;
-        int centerRow = static_cast<int>(balls[i]->y()) / config.cellSize;
+        int centerCol = static_cast<int>(balls[i]->x()) / config_.cellSize;
+        int centerRow = static_cast<int>(balls[i]->y()) / config_.cellSize;
 
-        int bCFS = balls[i]->radius() / config.cellSize + 1;
+        int bCFS = balls[i]->radius() / config_.cellSize + 1;
         int upperBBound = std::max(0, centerRow - bCFS);
         int lowerBBound = std::min(rows - 1, centerRow + bCFS);
         int leftBBound = std::max(0, centerCol - bCFS);
@@ -142,7 +142,7 @@ void GameLogic::updateBalls(qreal dt) {
         bool collided = false;
         for (int x = leftBBound; x <= rightBBound && !collided; x++) {
             for (int y = upperBBound; y <= lowerBBound && !collided; y++) {
-                QRectF cell(x * config.cellSize, y * config.cellSize, config.cellSize, config.cellSize);
+                QRectF cell(x * config_.cellSize, y * config_.cellSize, config_.cellSize, config_.cellSize);
                 if (balls[i]->traceColor() != cells[y][x]) {
                     if (balls[i]->resolveCellCollision(cell)) {
                         collided = true;
@@ -167,7 +167,7 @@ void GameLogic::updatePowers(qreal dt) {
             powers[i]->resolveBallCollision(*ball);
         }
 
-        powers[i]->resolveFieldCollision(cells, config.windowWidth, config.windowHeight);
+        powers[i]->resolveFieldCollision(cells, config_.windowWidth, config_.windowHeight);
 
         i++;
     }
@@ -207,10 +207,10 @@ void GameLogic::updateUpgrades() {
 
 void GameLogic::updateCells() {
     for (auto& ball : balls) {
-        int centerCol = static_cast<int>(ball->x()) / config.cellSize;
-        int centerRow = static_cast<int>(ball->y()) / config.cellSize;
+        int centerCol = static_cast<int>(ball->x()) / config_.cellSize;
+        int centerRow = static_cast<int>(ball->y()) / config_.cellSize;
 
-        int wCFS = ball->weaponLen() / config.cellSize + 1;
+        int wCFS = ball->weaponLen() / config_.cellSize + 1;
         int upperWBound = std::max(0, centerRow - wCFS);
         int lowerWBound = std::min(rows - 1, centerRow + wCFS);
         int leftWBound = std::max(0, centerCol - wCFS);
@@ -218,7 +218,7 @@ void GameLogic::updateCells() {
 
         for (int x = leftWBound; x <= rightWBound; x++) {
             for (int y = upperWBound; y <= lowerWBound; y++) {
-                QRectF cell(x * config.cellSize, y * config.cellSize, config.cellSize, config.cellSize);
+                QRectF cell(x * config_.cellSize, y * config_.cellSize, config_.cellSize, config_.cellSize);
                 if (ball->detectCellWeaponCollision(cell)) {
                     cells[y][x] = ball->traceColor();
                 }
@@ -228,8 +228,8 @@ void GameLogic::updateCells() {
 }
 
 void GameLogic::trySpawnUpgrade() {
-    if (QRandomGenerator::global()->bounded(200) == 1 && upgrades.size() < config.maxUpgradesCount) {
-        upgrades.push_back(Upgrade({static_cast<qreal>(config.windowWidth), static_cast<qreal>(config.windowHeight)}));
+    if (QRandomGenerator::global()->bounded(200) == 1 && upgrades.size() < config_.maxUpgradesCount) {
+        upgrades.push_back(Upgrade({static_cast<qreal>(config_.windowWidth), static_cast<qreal>(config_.windowHeight)}));
     }
 }
 

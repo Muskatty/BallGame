@@ -14,6 +14,8 @@ class BallGridWidget : public QWidget {
 public:
     BallGridWidget(QWidget *parent = nullptr);
 
+    void openSettings();
+
 #ifdef QT_DEBUG
 private:
     DebugWidget* debugWindow = nullptr;

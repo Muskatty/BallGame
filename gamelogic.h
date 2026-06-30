@@ -12,6 +12,8 @@ public:
 
     void applyConfig(const GameConfig& cfg);
 
+    const GameConfig& config() const {return config_;};
+
     void draw(QPainter& painter) const;
     void update(qreal dt);
 
@@ -37,12 +39,10 @@ private:
     void createPower(Ball* ball);
 
 private:
-    GameConfig config;
+    GameConfig config_;
 
-    int cols;// = windowWidth / cellSize;
-    int rows;// = windowHeight / cellSize;
-    //static constexpr double ballRadius = 12.0;
-    //static constexpr double weaponLen = 60.0;
+    int cols;
+    int rows;
 
     std::vector<std::unique_ptr<Ball>> balls;
     std::vector<Upgrade> upgrades;

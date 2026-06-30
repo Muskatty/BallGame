@@ -10,8 +10,6 @@ struct WeaponConfig {
     qreal length = 60.0;
     qreal velocity = 270.0;
     int damage = 10;
-
-    QPointF initialPosition;
 };
 
 struct BallConfig {

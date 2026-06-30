@@ -30,6 +30,7 @@ public:
 
 
     void invertVelocity() {vel = -vel;};
+    void setPosition(QPointF pos) {targetPos = pos;};
     void setLen(qreal len) {l = len;};
     void setTouching(const Ball* b, bool value);
     void setTouching(const Weapon* b, bool value);

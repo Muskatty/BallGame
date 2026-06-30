@@ -27,6 +27,8 @@ qt_add_executable(BallGame
     powercolors.h
     gameconfig.h
     gameconfig.cpp
+    settingsdialog.h settingsdialog.cpp
+    mainwindow.h mainwindow.cpp
 )
 
 target_link_libraries(BallGame

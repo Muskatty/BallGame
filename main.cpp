@@ -1,4 +1,4 @@
-#include "ballgrid.h"
+#include "mainwindow.h"
 
 #include <QApplication>
 
@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    BallGridWidget w;
+    MainWindow w;
     w.setWindowTitle(QStringLiteral("Ball Grid"));
     w.show();
 

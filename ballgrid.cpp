@@ -1,4 +1,6 @@
 #include "ballgrid.h"
+#include "settingsdialog.h"
+#include <QMenu>
 
 BallGridWidget::BallGridWidget(QWidget* parent) : QWidget(parent)
 {
@@ -13,9 +15,22 @@ BallGridWidget::BallGridWidget(QWidget* parent) : QWidget(parent)
     debugWindow->show();
 #endif
 
+    QMenu menu(this);
+    menu.addAction(QStringLiteral("Game Settings"));
+    //menu.addSection(QStringLiteral("Options"));
+
     timer.setInterval(16); // ~60 FPS
     connect(&timer, &QTimer::timeout, this, &BallGridWidget::onTick);
     timer.start();
+}
+
+void BallGridWidget::openSettings()
+{
+    SettingsDialog dlg(engine->config(), this);
+    if (dlg.exec() == QDialog::Accepted) {
+        engine->applyConfig(dlg.config());
+        setFixedSize(engine->config().windowWidth, engine->config().windowHeight);
+    }
 }
 
 void BallGridWidget::paintEvent(QPaintEvent*)
