@@ -16,7 +16,7 @@ void GameLogic::applyConfig(const GameConfig& cfg) {
 }
 
 void GameLogic::initField() {
-    cells.resize(rows, std::vector<QColor>(cols, QColor(60, 60, 60)));
+    cells.assign(rows, std::vector<QColor>(cols, QColor(60, 60, 60)));
     field = QRectF(0.0, 0.0, config_.windowWidth, config_.windowHeight);
 
     for (int i = 0; i < rows / 2; i++) {
