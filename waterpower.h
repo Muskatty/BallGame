@@ -14,11 +14,11 @@ class WaterPower : public Power
 public:
     WaterPower(Ball* p, qreal pot);
 
-    qreal radius() const { return rad * potency * (1.0 - lifet / maxlife); }
-    qreal innerRadius() const { return std::max(0.0, radius() - thick * 0.5); }
-    qreal outerRadius() const { return radius() + thick * 0.5; }
+    qreal radius() const { return radius_ * potency_ * (1.0 - lifetime_ / maxlife_); }
+    qreal innerRadius() const { return std::max(0.0, radius() - thickness_ * 0.5); }
+    qreal outerRadius() const { return radius() + thickness_ * 0.5; }
 
-    qreal halfAngle() const { return halfAng; }
+    qreal halfAngle() const { return halfAngle_; }
 
     bool isTouching(const Ball* b) const
     {
@@ -39,11 +39,11 @@ private:
 private:
     QSet<const Ball*> touchedBalls;
 
-    QPointF velocity;
-    qreal baseAngle;
-    qreal rad;
-    qreal thick;
-    qreal halfAng;
+    QPointF velocity_;
+    qreal baseAngle_;
+    qreal radius_;
+    qreal thickness_;
+    qreal halfAngle_;
 };
 
 #endif // WATERPOWER_H

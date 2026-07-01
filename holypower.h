@@ -4,16 +4,17 @@
 #include "power.h"
 
 static constexpr qreal holyMaxLife = 0.33;
+static constexpr qreal holyBaseRadius = 30.0;
 
 class HolyPower : public Power
 {
 public:
-    HolyPower(Ball* p, qreal pot) : Power(p, pot), rad(30.0) {
-        maxlife = holyMaxLife;
-        lifet = maxlife;
+    HolyPower(Ball* p, qreal pot) : Power(p, pot), radius_(holyBaseRadius) {
+        maxlife_ = holyMaxLife;
+        lifetime_ = maxlife_;
     };
 
-    qreal radius() const {return rad * potency * (1 - (lifet / maxlife));};
+    qreal radius() const {return radius_ * potency_ * (1 - (lifetime_ / maxlife_));};
 
     bool isTouching(const Ball* b) const {
         return touchedBalls.contains(b);
@@ -27,7 +28,7 @@ public:
 private:
     QSet<const Ball*> touchedBalls;
 
-    qreal rad;
+    qreal radius_;
 };
 
 #endif // HOLYPOWER_H

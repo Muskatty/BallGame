@@ -35,18 +35,18 @@ class Upgrade
 public:
     Upgrade(QPointF fieldSize);
 
-    QPointF pos() const {return position;};
-    qreal radius() const {return r;};
-    UpgradeType type() const {return t;};
+    QPointF pos() const {return position_;};
+    qreal radius() const {return radius_;};
+    UpgradeType type() const {return type_;};
 
-    void setPos(QPointF newPos) {position = newPos;};
+    void setPos(QPointF newPos) {position_ = newPos;};
 
     void draw(QPainter& painter) const;
 
 private:
-    QPointF position;
-    qreal r = 12;
-    UpgradeType t;
+    QPointF position_;
+    qreal radius_ = 12;
+    UpgradeType type_;
 };
 
 #endif // UPGRADE_H

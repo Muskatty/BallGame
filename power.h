@@ -9,7 +9,7 @@
 class Power
 {
 public:
-    Power(Ball* p, qreal pot) : parent(p), position(p ? p->center() : QPointF()), potency(pot) {};
+    Power(Ball* p, qreal pot) : parent_(p), position_(p ? p->center() : QPointF()), potency_(pot) {};
     virtual ~Power() = default;
 
     virtual void draw(QPainter& painter) const = 0;
@@ -18,17 +18,17 @@ public:
     virtual bool resolveBallCollision(Ball &other) = 0;
     virtual bool resolveFieldCollision(std::vector<std::vector<QColor>>& field, qreal width, qreal height) = 0;
 
-    qreal lifetime() const {return lifet;};
-    virtual void decreaseLife(qreal dt) {lifet -= dt;};
+    qreal lifetime() const {return lifetime_;};
+    virtual void decreaseLife(qreal dt) {lifetime_ -= dt;};
 
 protected:
-    qreal maxlife;
+    qreal maxlife_;
 
-    Ball* parent = nullptr;
-    QPointF vel;
-    QPointF position;
-    qreal lifet;
-    qreal potency = 1.0;
+    Ball* parent_ = nullptr;
+    QPointF velocity_;
+    QPointF position_;
+    qreal lifetime_;
+    qreal potency_ = 1.0;
 };
 
 #endif // POWER_H

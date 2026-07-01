@@ -6,21 +6,23 @@
 #include <QPainter>
 #include <QSet>
 
+static constexpr qreal weaponWidthGrowthMultiplier = 0.125;
+
 class Ball;
 
 class Weapon
 {
 public:
     Weapon() : targetPos(0.0, 0.0) {};
-    Weapon(QPointF pos, qreal v, qreal wid, qreal len) : targetPos(pos), vel(v), w(wid), l(len) {};
+    Weapon(QPointF pos, qreal vel, qreal width, qreal length) : targetPos(pos), velocity_(vel), width_(width), length_(length) {};
     Weapon(const WeaponConfig& cfg);
 
     QPointF pos() const {return targetPos;};
-    qreal length() const {return l;};
-    qreal width() const {return w;};
-    qreal angle() const {return angl;};
-    qreal velocity() const {return vel;};
-    qreal damage() const {return dmg;};
+    qreal length() const {return length_;};
+    qreal width() const {return width_;};
+    qreal angle() const {return currentAngle_;};
+    qreal velocity() const {return velocity_;};
+    qreal damage() const {return dmg_;};
     bool isTouching(const Ball* b) const {
         return touchingBalls.contains(b);
     }
@@ -29,15 +31,15 @@ public:
     }
 
 
-    void invertVelocity() {vel = -vel;};
+    void invertVelocity() {velocity_ = -velocity_;};
     void setPosition(QPointF pos) {targetPos = pos;};
-    void setLen(qreal len) {l = len;};
+    void setLen(qreal len) {length_ = len;};
     void setTouching(const Ball* b, bool value);
     void setTouching(const Weapon* b, bool value);
 
-    void accelerate(qreal accel) {vel = vel >= 0 ? vel + accel : vel - accel;};
-    void dmgUp(int up) {dmg += up;};
-    void sizeUp(qreal szUp) {w += szUp * 0.125; l += szUp;};
+    void accelerate(qreal accel) {velocity_ = velocity_ >= 0 ? velocity_ + accel : velocity_ - accel;};
+    void dmgUp(int up) {dmg_ += up;};
+    void sizeUp(qreal szUp) {width_ += szUp * weaponWidthGrowthMultiplier; length_ += szUp;};
 
     void updatePos(const QPointF& pos);
     void move(const qreal dt);
@@ -46,12 +48,12 @@ public:
     bool bounceOffWeapon(Weapon& other);
 private:
     QPointF targetPos;
-    qreal vel = 180.0;
-    qreal w = 4.0;
-    qreal l = 7.0;
-    qreal prevAngl = 0.0;
-    qreal angl = 0.0;
-    int dmg = 10;
+    qreal velocity_ = 180.0;
+    qreal width_ = 4.0;
+    qreal length_ = 7.0;
+    qreal previousAngle_ = 0.0;
+    qreal currentAngle_ = 0.0;
+    int dmg_ = 10;
     QSet<const Ball*> touchingBalls;
     QSet<const Weapon*> touchingWeapons;
 };

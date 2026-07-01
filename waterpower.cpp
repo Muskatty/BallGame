@@ -27,20 +27,20 @@ qreal signedAngleDiffDeg(qreal a, qreal b)
 
 
 WaterPower::WaterPower(Ball* p, qreal pot)
-    : Power(p, pot), rad(48.0), thick(18.0), halfAng(60.0)
+    : Power(p, pot), radius_(48.0), thickness_(18.0), halfAngle_(60.0)
 {
-    maxlife = waterMaxLife;
-    lifet = maxlife;
+    maxlife_ = waterMaxLife;
+    lifetime_ = maxlife_;
 
-    const QPointF v = parent->velocity();
+    const QPointF v = parent_->velocity();
     const qreal len = Geometry::length(v);
 
     if (len < EPS) {
-        baseAngle = 0.0;
-        velocity = QPointF(0.0, 0.0);
+        baseAngle_ = 0.0;
+        velocity_ = QPointF(0.0, 0.0);
     } else {
-        baseAngle = std::atan2(-v.y(), v.x()) * RAD2DEG;
-        velocity = v * (1 + waterVelModifier);
+        baseAngle_ = std::atan2(-v.y(), v.x()) * RAD2DEG;
+        velocity_ = v * (1 + waterVelModifier);
     }
 }
 
@@ -53,7 +53,7 @@ void WaterPower::setTouching(const Ball* b, bool value) {
 }
 
 bool WaterPower::containsPoint(const QPointF& point) const {
-    const QPointF center = position;
+    const QPointF center = position_;
     const qreal dx = point.x() - center.x();
     const qreal dy = point.y() - center.y();
 
@@ -63,13 +63,13 @@ bool WaterPower::containsPoint(const QPointF& point) const {
     }
 
     const qreal pointAngle = std::atan2(-dy, dx) * RAD2DEG;
-    const qreal diff = signedAngleDiffDeg(pointAngle, baseAngle);
+    const qreal diff = signedAngleDiffDeg(pointAngle, baseAngle_);
 
-    return std::abs(diff) <= halfAng;
+    return std::abs(diff) <= halfAngle_;
 }
 
 QPainterPath WaterPower::arcPath() const {
-    const QPointF center = position;
+    const QPointF center = position_;
     const qreal rIn = innerRadius();
     const qreal rOut = outerRadius();
 
@@ -78,8 +78,8 @@ QPainterPath WaterPower::arcPath() const {
     QRectF outerRect(center.x() - rOut, center.y() - rOut, 2.0 * rOut, 2.0 * rOut);
     QRectF innerRect(center.x() - rIn, center.y() - rIn, 2.0 * rIn, 2.0 * rIn);
 
-    const qreal startDeg = baseAngle - halfAng;
-    const qreal spanDeg = 2.0 * halfAng;
+    const qreal startDeg = baseAngle_ - halfAngle_;
+    const qreal spanDeg = 2.0 * halfAngle_;
 
     path.arcMoveTo(outerRect, startDeg);
     path.arcTo(outerRect, startDeg, spanDeg);
@@ -98,7 +98,7 @@ void WaterPower::draw(QPainter& painter) const {
 }
 
 bool WaterPower::resolveBallCollision(Ball& other) {
-    if (parent == &other) {
+    if (parent_ == &other) {
         return false;
     }
 
@@ -110,7 +110,7 @@ bool WaterPower::resolveBallCollision(Ball& other) {
     const bool firstTouch = !isTouching(&other);
 
     if (firstTouch) {
-        other.takeDamage(parent->weaponDmg());
+        other.takeDamage(parent_->weaponDmg());
     }
 
     setTouching(&other, true);
@@ -118,7 +118,7 @@ bool WaterPower::resolveBallCollision(Ball& other) {
 }
 
 bool WaterPower::resolveFieldCollision(std::vector<std::vector<QColor>>& field, qreal width, qreal height) {
-    const QPointF center = position;
+    const QPointF center = position_;
     const qreal rOut = outerRadius();
 
     const int cellSize = static_cast<int>(width / field[0].size());
@@ -138,7 +138,7 @@ bool WaterPower::resolveFieldCollision(std::vector<std::vector<QColor>>& field, 
                 );
 
             if (containsPoint(cellCenter)) {
-                field[y][x] = parent->traceColor();
+                field[y][x] = parent_->traceColor();
             }
         }
     }
@@ -147,6 +147,6 @@ bool WaterPower::resolveFieldCollision(std::vector<std::vector<QColor>>& field, 
 }
 
 void WaterPower::decreaseLife(qreal dt) {
-    lifet -= dt;
-    position += velocity * dt;
+    lifetime_ -= dt;
+    position_ += velocity_ * dt;
 }

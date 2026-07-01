@@ -2,11 +2,11 @@
 #include "geometry.h"
 
 EarthPower::EarthPower(Ball* p, qreal pot) : Power(p, pot) {
-    maxlife = earthMaxLife;
-    lifet = maxlife;
+    maxlife_ = earthMaxLife;
+    lifetime_ = maxlife_;
 
     radius = earthRadiusBase * pot * earthPotencyMul;
-    vel = p->velocity() * (1 + earthVelocityMul);
+    velocity_ = p->velocity() * (1 + earthVelocityMul);
 }
 
 void EarthPower::draw(QPainter& painter) const {
@@ -14,29 +14,29 @@ void EarthPower::draw(QPainter& painter) const {
     painter.setPen(Qt::black);
     painter.setBrush(powerToColor[PowerType::Earth]);
 
-    painter.drawEllipse(position, radius, radius);
+    painter.drawEllipse(position_, radius, radius);
 
     painter.restore();
 }
 
 bool EarthPower::resolveBallCollision(Ball& other) {
-    if (!parent) {
-        lifet = -1.0;
+    if (!parent_) {
+        lifetime_ = -1.0;
         return false;
     }
 
-    if (parent == &other || lifet < 0.0) {
+    if (parent_ == &other || lifetime_ < 0.0) {
         return false;
     }
 
-    Collision::CollisionInfo coll = Collision::circleCircle(position, radius, other.center(), other.radius());
+    Collision::CollisionInfo coll = Collision::circleCircle(position_, radius, other.center(), other.radius());
 
     if (!coll.hit) {
         return false;
     }
 
-    other.takeDamage(parent->weaponDmg() * earthDamageMul);
-    lifet = -1.0;
+    other.takeDamage(parent_->weaponDmg() * earthDamageMul);
+    lifetime_ = -1.0;
 
     return true;
 }
@@ -44,23 +44,23 @@ bool EarthPower::resolveBallCollision(Ball& other) {
 bool EarthPower::resolveFieldCollision(std::vector<std::vector<QColor>>& field, qreal width, qreal height) {
     bool collided = false;
 
-    if (position.x() - radius < 0.0) {
-        position.setX(radius);
-        vel.setX(-vel.x());
+    if (position_.x() - radius < 0.0) {
+        position_.setX(radius);
+        velocity_.setX(-velocity_.x());
         collided = true;
-    } else if (position.x() + radius > width) {
-        position.setX(width - radius);
-        vel.setX(-vel.x());
+    } else if (position_.x() + radius > width) {
+        position_.setX(width - radius);
+        velocity_.setX(-velocity_.x());
         collided = true;
     }
 
-    if (position.y() - radius < 0.0) {
-        position.setY(radius);
-        vel.setY(-vel.y());
+    if (position_.y() - radius < 0.0) {
+        position_.setY(radius);
+        velocity_.setY(-velocity_.y());
         collided = true;
-    } else if (position.y() + radius > height) {
-        position.setY(height - radius);
-        vel.setY(-vel.y());
+    } else if (position_.y() + radius > height) {
+        position_.setY(height - radius);
+        velocity_.setY(-velocity_.y());
         collided = true;
     }
 
@@ -72,10 +72,10 @@ bool EarthPower::resolveFieldCollision(std::vector<std::vector<QColor>>& field, 
 }
 
 void EarthPower::decreaseLife(qreal dt) {
-    lifet -= dt;
+    lifetime_ -= dt;
     update(dt);
 }
 
 void EarthPower::update(qreal dt) {
-    position += vel * dt;
+    position_ += velocity_ * dt;
 }

@@ -22,7 +22,7 @@ public:
 
 private:
     void update(qreal dt);
-    void accelerate(qreal mul) {vel *= mul;};
+    void accelerate(qreal mul) {velocity_ *= mul;};
 
 private:
     qreal radius = earthRadiusBase;

@@ -4,10 +4,10 @@
 #include <qdebug.h>
 
 Weapon::Weapon(const WeaponConfig& cfg) :
-    vel(cfg.velocity),
-    w(cfg.width),
-    l(cfg.length),
-    dmg(cfg.damage)
+    velocity_(cfg.velocity),
+    width_(cfg.width),
+    length_(cfg.length),
+    dmg_(cfg.damage)
 {
 
 }
@@ -17,12 +17,12 @@ void Weapon::updatePos(const QPointF& pos) {
 }
 
 void Weapon::move(const qreal dt) {
-    prevAngl = angl;
-    angl += vel * dt;
-    if (angl > 360.0) {
-        angl -= 360.0;
-    } else if (angl < 0.0) {
-        angl += 360.0;
+    previousAngle_ = currentAngle_;
+    currentAngle_ += velocity_ * dt;
+    if (currentAngle_ > 360.0) {
+        currentAngle_ -= 360.0;
+    } else if (currentAngle_ < 0.0) {
+        currentAngle_ += 360.0;
     }
 }
 
@@ -32,9 +32,9 @@ void Weapon::draw(QPainter& painter) const {
 
     painter.save();
     painter.translate(centerX, centerY);
-    painter.rotate(angl);
+    painter.rotate(currentAngle_);
 
-    QRectF rect(-w / 2.0, -l, w, l);
+    QRectF rect(-width_ / 2.0, -length_, width_, length_);
 
     painter.setBrush(Qt::blue);
     painter.drawRect(rect);
@@ -44,11 +44,11 @@ void Weapon::draw(QPainter& painter) const {
 
 bool Weapon::detectCellCollision(const QRectF& cellRect) const
 {
-    const QRectF weaponRect(-w / 2.0, -l, w, l);
+    const QRectF weaponRect(-width_ / 2.0, -length_, width_, length_);
 
     QTransform weaponTransform;
     weaponTransform.translate(targetPos.x(), targetPos.y());
-    weaponTransform.rotate(angl);
+    weaponTransform.rotate(currentAngle_);
 
     const QTransform cellTransform;
 
@@ -106,8 +106,8 @@ bool Weapon::bounceOffWeapon(Weapon& other)
 
     if (firstTouch) {
         if (coll.overlap > 0.05) {
-            angl = prevAngl;
-            other.angl = other.prevAngl;
+            currentAngle_ = previousAngle_;
+            other.currentAngle_ = other.previousAngle_;
         }
         invertVelocity();
         other.invertVelocity();

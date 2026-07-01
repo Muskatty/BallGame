@@ -2,20 +2,20 @@
 #include <QRandomGenerator>
 
 Upgrade::Upgrade(QPointF fieldSize) {
-    int lower = static_cast<int>(r);
-    int upperX = static_cast<int>(fieldSize.x() - r);
-    int upperY = static_cast<int>(fieldSize.y() - r);
+    int lower = static_cast<int>(radius_);
+    int upperX = static_cast<int>(fieldSize.x() - radius_);
+    int upperY = static_cast<int>(fieldSize.y() - radius_);
     qreal x = QRandomGenerator::global()->bounded(lower, upperX);
     qreal y = QRandomGenerator::global()->bounded(lower, upperY);
-    position = QPointF(x, y);
+    position_ = QPointF(x, y);
 
     int ty = QRandomGenerator::global()->bounded((int)UpgradeType::Count);
-    t = static_cast<UpgradeType>(ty);
+    type_ = static_cast<UpgradeType>(ty);
 }
 
 void Upgrade::draw(QPainter& painter) const
 {
-    painter.setBrush(toColor[t]);
+    painter.setBrush(toColor[type_]);
     painter.setPen(Qt::black);
-    painter.drawEllipse(position, r, r);
+    painter.drawEllipse(position_, radius_, radius_);
 }

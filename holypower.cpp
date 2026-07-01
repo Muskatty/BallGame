@@ -12,15 +12,15 @@ void HolyPower::setTouching(const Ball* b, bool value) {
 void HolyPower::draw(QPainter& painter) const {
     painter.setBrush(powerToColor[PowerType::Holy]);
     painter.setPen(Qt::NoPen);
-    painter.drawEllipse(position, radius(), radius());
+    painter.drawEllipse(position_, radius(), radius());
 }
 
 bool HolyPower::resolveBallCollision(Ball& other) {
-    if (parent == &other) {
+    if (parent_ == &other) {
         return false;
     }
 
-    Collision::CollisionInfo coll = Collision::circleCircle(position, radius(), other.center(), other.radius());
+    Collision::CollisionInfo coll = Collision::circleCircle(position_, radius(), other.center(), other.radius());
 
     if (!coll.hit) {
         setTouching(&other, false);
@@ -30,7 +30,7 @@ bool HolyPower::resolveBallCollision(Ball& other) {
     bool firstHit = !isTouching(&other);
 
     if (firstHit) {
-        other.takeDamage(parent->weaponDmg());
+        other.takeDamage(parent_->weaponDmg());
         setTouching(&other, true);
     }
 
@@ -42,8 +42,8 @@ bool HolyPower::resolveFieldCollision(std::vector<std::vector<QColor>>& field, q
     int cols = field[0].size();
     qreal cellSize = width / cols;
 
-    int centerCol = static_cast<int>(position.x()) / cellSize;
-    int centerRow = static_cast<int>(position.y()) / cellSize;
+    int centerCol = static_cast<int>(position_.x()) / cellSize;
+    int centerRow = static_cast<int>(position_.y()) / cellSize;
 
     int pCFS = radius() / cellSize + 1;
     int upperBound = std::max(0, centerRow - pCFS);
@@ -56,9 +56,9 @@ bool HolyPower::resolveFieldCollision(std::vector<std::vector<QColor>>& field, q
     for (int x = leftBound; x <= rightBound; x++) {
         for (int y = upperBound; y <= lowerBound; y++) {
             QRectF cell(x * cellSize, y * cellSize, cellSize, cellSize);
-            Collision::CollisionInfo coll = Collision::circleRect(position, radius(), cell, transform);
+            Collision::CollisionInfo coll = Collision::circleRect(position_, radius(), cell, transform);
             if (coll.hit) {
-                field[y][x] = parent->traceColor();
+                field[y][x] = parent_->traceColor();
             }
         }
     }
